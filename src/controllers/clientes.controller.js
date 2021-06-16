@@ -2,12 +2,13 @@
 /* eslint-disable no-unused-vars */
 const db = require('../config/database');
 
+// ==> Método que adicionará um cliente ao banco de dados
 exports.createCliente = async (req, res) => {
   const {
     nome, cnpj, endereco, email, cidade, estado, telefone, ativo,
   } = req.body;
   try {
-    const insertQuery = 'INSERT INTO clientes (nome, cnpj, endereco, email, cidade, estado, telefone, ativo) VALUES (?, ?, ?, ?, ?, ?, ?)';
+    const insertQuery = 'INSERT INTO clientes (nome, cnpj, endereco, email, cidade, estado, telefone, ativo) VALUES (?, ?, ?, ?, ?, ?, ?, ?)';
     db.execute(insertQuery,
       [nome, cnpj, endereco, email, cidade, estado, telefone, ativo],
       (err, results) => {
@@ -32,6 +33,7 @@ exports.createCliente = async (req, res) => {
   }
 };
 
+// ==> Método que atualizará um cliente específico
 exports.updateCliente = async (req, res) => {
   const {
     nome, cnpj, endereco, email, cidade, estado, telefone, ativo, id,
@@ -62,6 +64,7 @@ exports.updateCliente = async (req, res) => {
   }
 };
 
+// ==> Método que deletará um cliente específico
 exports.deleteCliente = async (req, res) => {
   const { id } = req.body;
   try {
@@ -85,6 +88,7 @@ exports.deleteCliente = async (req, res) => {
   }
 };
 
+// ==> Método que listará todos os clientes
 exports.listAllClientes = async (req, res) => {
   try {
     db.execute('SELECT * FROM clientes', (err, results) => {
@@ -103,6 +107,7 @@ exports.listAllClientes = async (req, res) => {
   }
 };
 
+// ==> Método que listará um cliente específico
 exports.listOneCliente = async (req, res) => {
   try {
     db.execute('SELECT * FROM clientes WHERE id = ?', [req.params.id], (err, results) => {

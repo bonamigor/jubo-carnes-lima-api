@@ -2,6 +2,7 @@
 /* eslint-disable no-unused-vars */
 const db = require('../config/database');
 
+// ==> Método que cria uma estante
 exports.createEstante = async (req, res) => {
   const {
     periodo, clienteId,
@@ -37,6 +38,7 @@ exports.createEstante = async (req, res) => {
   }
 };
 
+// ==> Método que atualiza uma estante
 exports.updateEstante = async (req, res) => {
   const { periodo, clienteId, id } = req.body;
   try {
@@ -62,6 +64,7 @@ exports.updateEstante = async (req, res) => {
   }
 };
 
+// ==> Método que deleta uma estante
 exports.deleteEstante = async (req, res) => {
   const { id } = req.params;
   try {
@@ -123,6 +126,7 @@ exports.listAllEstantesCliente = async (req, res) => {
   }
 };
 
+// ==> Método que lista uma estante específica
 exports.listOneEstante = async (req, res) => {
   try {
     db.execute('SELECT * from estantes WHERE id = ?',

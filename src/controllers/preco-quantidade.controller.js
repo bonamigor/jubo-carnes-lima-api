@@ -43,8 +43,12 @@ exports.AddProdutoNaEstanteComPrecoEQuantidade = async (req, res) => {
   const insertQueryPreco = 'INSERT INTO preco_quantidade (preco_venda, quantidade) VALUES (?, ?);';
   try {
     db.execute(insertQueryPreco, [precoVenda, quantidade], (err, result) => {
-      if (err) {
-        console.log('deu bosta');
+      if (err || !result.affectedRows) {
+        res.status(500).send({
+          developMessage: err.sqlMessage,
+          userMessage: 'Falha ao adicionar o Produto da Estante.',
+        });
+        return false;
       }
       db.execute(insertQueryEstante, [idEstante, idProduto, result.insertId], (error, results) => {
         if (error) {
@@ -55,7 +59,7 @@ exports.AddProdutoNaEstanteComPrecoEQuantidade = async (req, res) => {
           return false;
         }
         res.status(201).send({
-          message: `Produto adicionado na Estante de ID ${idEstante}`,
+          message: `Produto de ID ${idProduto} adicionado na Estante de ID ${idEstante}`,
           affectedRows: results.affectedRows,
         });
       });
