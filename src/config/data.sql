@@ -19,6 +19,7 @@ create table estantes (
 id bigint not null auto_increment, 
 periodo varchar(7) not null, 
 cliente_id int(11) not null, 
+ativa tinyint(1),
 primary key (id), 
 foreign key (cliente_id) references clientes(id));
 
@@ -44,10 +45,39 @@ foreign key (estante_id) references estantes(id),
 foreign key (produto_id) references produtos(id),
 foreign key (preco_quantidade_id) references preco_quantidade(id) on delete cascade);
 
-create table pedido (
+create table users (
+  id bigint not null auto_increment,
+  nome varchar(255) not null, 
+  email varchar(255) not null, 
+  senha varchar(255) not null, 
+  admin tinyint(1) not null,
+  cliente_id bigint unique not null,
+  primary key(id),
+  foreign key (cliente_id) references clientes(id)
+);
+
+create table pedidos (
+  id bigint not null auto_increment,
+  data_criacao date not null,
+  data_confirmacao date,
+  data_cancelamento date,
+  data_entrega date,
+  valor_total double(7,2) not null,
+  cliente_id bigint not null,
+  primary key(id),
+  foreign key (cliente_id) references clientes(id)
 );
 
 create table item_pedido (
+  id bigint not null auto_increment,
+  quantidade int(11) not null,
+  preco_total double(7,2) not null,
+  observacao varchar(255),
+  pedido_id bigint not null,
+  produto_id bigint not null,
+  primary key(id),
+  foreign key (pedido_id) references pedidos(id),
+  foreign key (produto_id) references produtos(id)
 );
 
 SELECT estante_id, produtos.nome, produtos.preco_custo, produtos.unidade_medida, preco_quantidade.preco_venda, preco_quantidade.quantidade

@@ -1,10 +1,14 @@
 const express = require('express');
 
+const authRoutes = require('./auth.routes');
+const userRoutes = require('./user.routes');
 const clienteRoutes = require('./clientes.routes');
 const estanteRoutes = require('./estantes.routes');
 const produtoRoutes = require('./produtos.routes');
 const estanteProdutoRoutes = require('./estante-produto.routes');
 const precoQuantidadeRoutes = require('./preco-quantidade.routes');
+const pedidoRoutes = require('./pedido.routes');
+const itemPedidoRoutes = require('./item-pedido.routes');
 
 const router = express.Router();
 
@@ -18,8 +22,13 @@ router.get('/api', (req, res) => {
 
 module.exports = [
   router,
+  authRoutes,
+  userRoutes,
   clienteRoutes,
   estanteRoutes,
   produtoRoutes,
   estanteProdutoRoutes,
-  precoQuantidadeRoutes];
+  precoQuantidadeRoutes,
+  pedidoRoutes,
+  itemPedidoRoutes,
+];
