@@ -16,10 +16,18 @@ exports.authenticate = async (req, res) => {
       return false;
     }
 
-    const { userEmail, id } = results[0];
-
-    const token = jwt.sign({ userEmail, id }, process.env.JWT_SECRET, { expiresIn: 60 * 60 * 24 });
-
-    res.status(200).send(token);
+    if (results.length === 0) {
+      res.status(404).send({
+        message: 'Não foi possível localizar o usuário.',
+      });
+    } else {
+      const { userEmail, id } = results[0];
+      const userToken = jwt.sign(
+        { userEmail, id },
+        process.env.JWT_SECRET,
+        { expiresIn: 60 * 60 * 24 },
+      );
+      res.status(200).send({ token: userToken });
+    }
   });
 };
