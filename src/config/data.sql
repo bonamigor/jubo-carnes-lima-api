@@ -18,7 +18,7 @@ primary key(id)
 create table estantes (
 id bigint not null auto_increment, 
 periodo varchar(7) not null, 
-cliente_id int(11) not null, 
+cliente_id bigint not null, 
 ativa tinyint(1),
 primary key (id), 
 foreign key (cliente_id) references clientes(id));
@@ -51,7 +51,7 @@ create table users (
   email varchar(255) not null, 
   senha varchar(255) not null, 
   admin tinyint(1) not null,
-  cliente_id bigint unique not null,
+  cliente_id bigint unique,
   primary key(id),
   foreign key (cliente_id) references clientes(id)
 );
