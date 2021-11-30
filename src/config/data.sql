@@ -3,7 +3,7 @@
 create database jubo;
 
 create table clientes (
-id bigint not null auto_increment,
+id int not null auto_increment,
 nome varchar(255) not null, 
 cnpj varchar(14) not null, 
 endereco varchar(255), 
@@ -11,70 +11,70 @@ email varchar(255),
 cidade varchar(50), 
 estado varchar(50), 
 telefone varchar(11), 
-ativo tinyint(1), 
+ativo tinyint, 
 primary key(id)
 );
 
 create table estantes (
-id bigint not null auto_increment, 
+id int not null auto_increment, 
 periodo varchar(7) not null, 
-cliente_id bigint not null, 
-ativa tinyint(1),
+cliente_id int not null, 
+ativa tinyint,
 primary key (id), 
 foreign key (cliente_id) references clientes(id));
 
 create table produtos (
-id bigint not null auto_increment, 
+id int not null auto_increment, 
 nome varchar(255) not null, 
-preco_custo double(7,2) not null, 
+preco_custo double not null, 
 unidade_medida varchar(4) not null, 
 primary key(id));
 
 create table preco_quantidade (
-id bigint not null auto_increment, 
-preco_venda double(7,2) not null, 
+id int not null auto_increment, 
+preco_venda double not null, 
 quantidade int not null, 
 primary key (id));
 
 create table estante_produto (
-estante_id bigint not null, 
-produto_id bigint not null, 
-preco_quantidade_id bigint not null,
+estante_id int not null, 
+produto_id int not null, 
+preco_quantidade_id int not null,
 primary key(estante_id, produto_id), 
 foreign key (estante_id) references estantes(id), 
 foreign key (produto_id) references produtos(id),
 foreign key (preco_quantidade_id) references preco_quantidade(id) on delete cascade);
 
 create table users (
-  id bigint not null auto_increment,
+  id int not null auto_increment,
   nome varchar(255) not null, 
   email varchar(255) not null, 
   senha varchar(255) not null, 
-  admin tinyint(1) not null,
-  cliente_id bigint unique,
+  admin tinyint not null,
+  cliente_id int unique,
   primary key(id),
   foreign key (cliente_id) references clientes(id)
 );
 
 create table pedidos (
-  id bigint not null auto_increment,
+  id int not null auto_increment,
   data_criacao date not null,
   data_confirmacao date,
   data_cancelamento date,
   data_entrega date,
-  valor_total double(7,2) not null,
-  cliente_id bigint not null,
+  valor_total double not null,
+  cliente_id int not null,
   primary key(id),
   foreign key (cliente_id) references clientes(id)
 );
 
 create table item_pedido (
-  id bigint not null auto_increment,
-  quantidade int(11) not null,
-  preco_total double(7,2) not null,
+  id int not null auto_increment,
+  quantidade int not null,
+  preco_total double not null,
   observacao varchar(255),
-  pedido_id bigint not null,
-  produto_id bigint not null,
+  pedido_id int not null,
+  produto_id int not null,
   primary key(id),
   foreign key (pedido_id) references pedidos(id),
   foreign key (produto_id) references produtos(id)
