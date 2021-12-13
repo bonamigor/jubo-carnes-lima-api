@@ -12,7 +12,7 @@ exports.createPedido = async (req, res) => {
       (err, results) => {
         if (err || results.affectedRows === 0) {
           res.status(500).send({
-            developMessage: err.sqlMessage,
+            developMessage: err.message,
             userMessage: 'Falha ao criar o Pedido.',
           });
           return false;
@@ -43,7 +43,7 @@ exports.confirmaPedido = async (req, res) => {
       (err, results) => {
         if (err) {
           res.status(500).send({
-            developMessage: err.sqlMessage,
+            developMessage: err.message,
             userMessage: 'Falha ao confirmar o Pedido.',
           });
           return false;
@@ -74,7 +74,7 @@ exports.entregaPedido = async (req, res) => {
       (err, results) => {
         if (err) {
           res.status(500).send({
-            developMessage: err.sqlMessage,
+            developMessage: err.message,
             userMessage: 'Falha ao alterar o status do Pedido para ENTREGUE.',
           });
           return false;
@@ -104,7 +104,7 @@ exports.cancelaPedido = async (req, res) => {
     db.execute(selectPedido, [pedidoId], (err, results) => {
       if (err) {
         res.status(500).send({
-          developMessage: err.sqlMessage,
+          developMessage: err.message,
           userMessage: 'Falha ao recuperar o Pedido.',
         });
         return false;
@@ -151,7 +151,7 @@ exports.deletePedido = async (req, res) => {
       [pedidoId], (err, results) => {
         if (err || results.affectedRows === 0) {
           res.status(500).send({
-            developMessage: err.sqlMessage,
+            developMessage: err.message,
             userMessage: 'Falha ao deletar o itens do Pedido.',
           });
           return false;
@@ -182,7 +182,7 @@ exports.listAllPedidos = async (req, res) => {
     db.execute('SELECT * FROM pedidos', (err, results) => {
       if (err) {
         res.status(500).send({
-          developMessage: err.sqlMessage,
+          developMessage: err.message,
           userMessage: 'Falha ao listar os pedidos.',
         });
         return false;
@@ -202,7 +202,7 @@ exports.listOnePedido = async (req, res) => {
     db.execute('SELECT * FROM pedidos WHERE id = ?', [pedidoId], (err, results) => {
       if (err) {
         res.status(500).send({
-          developMessage: err.sqlMessage,
+          developMessage: err.message,
           userMessage: 'Falha ao listar o Pedido.',
         });
         return false;
@@ -222,7 +222,7 @@ exports.calculaValorTotal = async (req, res) => {
     db.execute(selectQuery, [pedidoId], (err, results) => {
       if (err) {
         res.status(500).send({
-          developMessage: err.sqlMessage,
+          developMessage: err.message,
           userMessage: 'Falha ao calcular o valor total do Pedido.',
         });
         return false;

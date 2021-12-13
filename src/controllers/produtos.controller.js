@@ -12,7 +12,7 @@ exports.createProduto = async (req, res) => {
     db.execute(insertQuery, [nome, precoCusto, unidadeMedida], (err, results) => {
       if (err) {
         res.status(500).send({
-          developMessage: err.sqlMessage,
+          developMessage: err.message,
           userMessage: 'Falha ao criar o Produto.',
         });
         return false;
@@ -44,7 +44,7 @@ exports.updateProduto = async (req, res) => {
     db.execute(updateQuery, [nome, precoCusto, unidadeMedida, id], (err, results) => {
       if (err) {
         res.status(500).send({
-          developMessage: err.sqlMessage,
+          developMessage: err.message,
           userMessage: 'Falha ao atualizar o Produto.',
         });
         return false;
@@ -69,7 +69,7 @@ exports.deleteProduto = async (req, res) => {
     db.execute('DELETE FROM produtos WHERE id = ?', [req.params.id], (err, results) => {
       if (err) {
         res.status(500).send({
-          developMessage: err.sqlMessage,
+          developMessage: err.message,
           userMessage: 'Falha ao excluir o Produto.',
         });
         return false;
@@ -91,7 +91,7 @@ exports.listAllProdutos = async (req, res) => {
     db.execute('SELECT * FROM produtos', (err, results) => {
       if (err) {
         res.status(500).send({
-          developMessage: err.sqlMessage,
+          developMessage: err.message,
           userMessage: 'Falha ao listar os Produtos.',
         });
         return false;
@@ -111,7 +111,7 @@ exports.listOneProduto = async (req, res) => {
       (err, results) => {
         if (err) {
           res.status(500).send({
-            developMessage: err.sqlMessage,
+            developMessage: err.message,
             userMessage: 'Falha ao listar o Produto.',
           });
           return false;

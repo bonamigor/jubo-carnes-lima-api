@@ -4,31 +4,29 @@ const db = require('../config/database');
 
 // ==> Método que adicionará um cliente ao banco de dados
 exports.createCliente = async (req, res) => {
-  const {
-    nome, cnpj, endereco, email, cidade, estado, telefone, ativo,
-  } = req.body;
   try {
-    const insertQuery = 'INSERT INTO clientes (nome, cnpj, endereco, email, cidade, estado, telefone, ativo) VALUES (?, ?, ?, ?, ?, ?, ?, ?)';
-    db.execute(insertQuery,
-      [nome, cnpj, endereco, email, cidade, estado, telefone, ativo],
-      (err, results) => {
-        if (err) {
-          res.status(500).send({
-            developMessage: err.sqlMessage,
-            userMessage: 'Falha ao criar o Cliente.',
-          });
-          return false;
-        }
-        res.status(201).send({
-          message: 'Cliente criado com sucesso!',
-          cliente: {
-            nome, cnpj, endereco, email, cidade, estado, telefone, ativo,
-          },
-          affectedRows: results.affectedRows,
+    const {
+      nome, cnpj, endereco, email, cidade, estado, cep, telefone, ativo,
+    } = req.body;
+    const insertQuery = 'INSERT INTO clientes (nome, cnpj, endereco, email, cidade, estado, cep, telefone, ativo) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)';
+    const queryData = [nome, cnpj, endereco, email, cidade, estado, cep, telefone, ativo];
+    db.execute(insertQuery, queryData, (err, results) => {
+      if (err) {
+        res.status(500).send({
+          developMessage: err.message,
+          userMessage: 'Falha ao criar o Cliente.',
         });
+        return false;
+      }
+      res.status(201).send({
+        message: 'Cliente criado com sucesso!',
+        cliente: {
+          nome, cnpj, endereco, email, cidade, estado, cep, telefone, ativo,
+        },
+        affectedRows: results.affectedRows,
       });
+    });
   } catch (error) {
-    console.error('createCliente', error);
     res.status(500).send({ message: 'Ocorreu um erro ao criar o Cliente.' });
   }
 };
@@ -36,16 +34,16 @@ exports.createCliente = async (req, res) => {
 // ==> Método que atualizará um cliente específico
 exports.updateCliente = async (req, res) => {
   const {
-    nome, cnpj, endereco, email, cidade, estado, telefone, ativo, id,
+    nome, cnpj, endereco, email, cidade, estado, cep, telefone, ativo, id,
   } = req.body;
   try {
-    const updateQuery = 'UPDATE clientes SET nome = ?, cnpj = ?, endereco = ?, email = ?, cidade = ?, estado = ?, telefone = ?, ativo = ? WHERE id = ?';
+    const updateQuery = 'UPDATE clientes SET nome = ?, cnpj = ?, endereco = ?, email = ?, cidade = ?, estado = ?, cep = ?, telefone = ?, ativo = ? WHERE id = ?';
     db.execute(updateQuery,
-      [nome, cnpj, endereco, email, cidade, estado, telefone, ativo, id],
+      [nome, cnpj, endereco, email, cidade, estado, cep, telefone, ativo, id],
       (err, results) => {
         if (err) {
           res.status(500).send({
-            developMessage: err.sqlMessage,
+            developMessage: err.message,
             userMessage: 'Falha ao atualizar o Cliente.',
           });
           return false;
@@ -53,7 +51,7 @@ exports.updateCliente = async (req, res) => {
         res.status(201).send({
           message: 'Cliente atualizado com sucesso!',
           cliente: {
-            id, nome, cnpj, endereco, email, cidade, estado, telefone, ativo,
+            id, nome, cnpj, endereco, email, cidade, estado, cep, telefone, ativo,
           },
           affectedRows: results.affectedRows,
         });
@@ -66,13 +64,12 @@ exports.updateCliente = async (req, res) => {
 
 // ==> Método que deletará um cliente específico
 exports.deleteCliente = async (req, res) => {
-  const { id } = req.body;
   try {
     db.execute('DELETE FROM clientes WHERE id = ?',
-      [id], (err, results) => {
+      [req.params.id], (err, results) => {
         if (err) {
           res.status(500).send({
-            developMessage: err.sqlMessage,
+            developMessage: err.message,
             userMessage: 'Falha ao deletar o Cliente.',
           });
           return false;
@@ -94,7 +91,7 @@ exports.listAllClientes = async (req, res) => {
     db.execute('SELECT * FROM clientes', (err, results) => {
       if (err) {
         res.status(500).send({
-          developMessage: err.sqlMessage,
+          developMessage: err.message,
           userMessage: 'Falha ao listar os Clientes.',
         });
         return false;
@@ -113,12 +110,12 @@ exports.listOneCliente = async (req, res) => {
     db.execute('SELECT * FROM clientes WHERE id = ?', [req.params.id], (err, results) => {
       if (err) {
         res.status(500).send({
-          developMessage: err.sqlMessage,
+          developMessage: err.message,
           userMessage: 'Falha ao listar o Cliente.',
         });
         return false;
       }
-      res.status(200).send({ cliente: results });
+      res.status(200).send({ cliente: results[0] });
     });
   } catch (error) {
     console.error('listOneCliente', error);

@@ -9,7 +9,7 @@ exports.addProdutoNaEstante = async (req, res) => {
     db.execute(insertQuery, [idEstante, idProduto], (err, results) => {
       if (err) {
         res.status(500).send({
-          developMessage: err.sqlMessage,
+          developMessage: err.message,
           userMessage: 'Falha ao listar os Produtos da Estante.',
         });
         return false;
@@ -33,7 +33,7 @@ exports.deleteProdutoDaEstante = async (req, res) => {
     db.execute(deleteQuery, [idEstante, idProduto], (err, results) => {
       if (err) {
         res.status(500).send({
-          developMessage: err.sqlMessage,
+          developMessage: err.message,
           userMessage: 'Falha ao excluir o Produto da Estante.',
         });
         return false;
@@ -56,7 +56,7 @@ exports.listAllProdutosNaEstante = async (req, res) => {
     db.execute(selectQuery, [req.params.id], (err, results) => {
       if (err) {
         res.status(500).send({
-          developMessage: err.sqlMessage,
+          developMessage: err.message,
           userMessage: 'Falha ao listar os Produtos da Estante.',
         });
         return false;

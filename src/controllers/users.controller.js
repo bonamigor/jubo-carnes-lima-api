@@ -15,7 +15,7 @@ exports.createUser = async (req, res) => {
       (err, results) => {
         if (err || results.affectedRows === 0) {
           res.status(500).send({
-            developMessage: err.sqlMessage,
+            developMessage: err.message,
             userMessage: 'Falha ao criar o Usuário.',
           });
           return false;
@@ -43,7 +43,7 @@ exports.updateUser = async (req, res) => {
       (err, results) => {
         if (err) {
           res.status(500).send({
-            developMessage: err.sqlMessage,
+            developMessage: err.message,
             userMessage: 'Falha ao atualizar o Usuário.',
           });
           return false;
@@ -70,7 +70,7 @@ exports.deleteUser = async (req, res) => {
       [id], (err, results) => {
         if (err) {
           res.status(500).send({
-            developMessage: err.sqlMessage,
+            developMessage: err.message,
             userMessage: 'Falha ao deletar o Usuário.',
           });
           return false;
@@ -92,7 +92,7 @@ exports.listAllUsers = async (req, res) => {
     db.execute('SELECT id, nome, email, admin, cliente_id FROM users', (err, results) => {
       if (err) {
         res.status(500).send({
-          developMessage: err.sqlMessage,
+          developMessage: err.message,
           userMessage: 'Falha ao listar os Usuários.',
         });
         return false;
@@ -111,7 +111,7 @@ exports.listOneUser = async (req, res) => {
     db.execute('SELECT id, nome, email, admin, cliente_id FROM users WHERE id = ?', [req.params.id], (err, results) => {
       if (err) {
         res.status(500).send({
-          developMessage: err.sqlMessage,
+          developMessage: err.message,
           userMessage: 'Falha ao listar o Usuário.',
         });
         return false;

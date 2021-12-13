@@ -14,7 +14,7 @@ exports.adicionarItemAoPedido = async (req, res) => {
     db.execute(insertQuery, [pedidoId, produtoId, quantidade, precoTotal], (error, result) => {
       if (error || result.affectedRows === 0) {
         res.status(500).send({
-          developMessage: err.sqlMessage,
+          developMessage: err.message,
           userMessage: 'Falha ao inserir o Item ao pedido.',
         });
         return false;

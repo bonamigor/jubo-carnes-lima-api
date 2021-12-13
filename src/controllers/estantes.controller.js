@@ -16,7 +16,7 @@ exports.createEstante = async (req, res) => {
     db.execute(insertQuery, [periodo, clienteId], (err, results, fields) => {
       if (err) {
         res.status(500).send({
-          developMessage: err.sqlMessage,
+          developMessage: err.message,
           userMessage: 'Falha ao criar a Estante.',
         });
         return false;
@@ -46,7 +46,7 @@ exports.updateEstante = async (req, res) => {
     db.execute(updateQuery, [periodo, clienteId, id], (err, results, fields) => {
       if (err) {
         res.status(500).send({
-          developMessage: err.sqlMessage,
+          developMessage: err.message,
           userMessage: 'Falha ao atualizar a Estante.',
         });
         return false;
@@ -71,7 +71,7 @@ exports.deleteEstante = async (req, res) => {
     db.execute('DELETE FROM estantes WHERE id = ?', [id], (err, results) => {
       if (err) {
         res.status(500).send({
-          developMessage: err.sqlMessage,
+          developMessage: err.message,
           userMessage: 'Falha ao excluir a Estante.',
         });
         return false;
@@ -93,7 +93,7 @@ exports.listAllEstantes = async (req, res) => {
     db.execute('SELECT * FROM estantes', (err, results) => {
       if (err) {
         res.status(500).send({
-          developMessage: err.sqlMessage,
+          developMessage: err.message,
           userMessage: 'Falha ao listar as Estantes.',
         });
         return false;
@@ -113,7 +113,7 @@ exports.listAllEstantesCliente = async (req, res) => {
     db.execute(selectQuery, (err, results) => {
       if (err) {
         res.status(500).send({
-          developMessage: err.sqlMessage,
+          developMessage: err.message,
           userMessage: 'Falha ao listar as Estantee.',
         });
         return false;
@@ -134,7 +134,7 @@ exports.listOneEstante = async (req, res) => {
       (err, results) => {
         if (err) {
           res.status(500).send({
-            developMessage: err.sqlMessage,
+            developMessage: err.message,
             userMessage: 'Falha ao listar a Estante.',
           });
           return false;

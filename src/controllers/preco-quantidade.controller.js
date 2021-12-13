@@ -20,7 +20,7 @@ exports.listarDetalhado = async (req, res) => {
     db.execute(selectQuery, [req.params.id], (err, results) => {
       if (err) {
         res.status(500).send({
-          developMessage: err.sqlMessage,
+          developMessage: err.message,
           userMessage: 'Falha ao listar os Produtos da Estante com detalhes.',
         });
         return false;
@@ -45,7 +45,7 @@ exports.AddProdutoNaEstanteComPrecoEQuantidade = async (req, res) => {
     db.execute(insertQueryPreco, [precoVenda, quantidade], (err, result) => {
       if (err || !result.affectedRows) {
         res.status(500).send({
-          developMessage: err.sqlMessage,
+          developMessage: err.message,
           userMessage: 'Falha ao adicionar o Produto da Estante.',
         });
         return false;
@@ -53,7 +53,7 @@ exports.AddProdutoNaEstanteComPrecoEQuantidade = async (req, res) => {
       db.execute(insertQueryEstante, [idEstante, idProduto, result.insertId], (error, results) => {
         if (error) {
           res.status(500).send({
-            developMessage: err.sqlMessage,
+            developMessage: err.message,
             userMessage: 'Falha ao adicionar o Produto da Estante.',
           });
           return false;

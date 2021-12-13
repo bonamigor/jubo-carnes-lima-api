@@ -15,7 +15,7 @@ router.post('/clientes', clienteController.createCliente);
 // ==> PUT http://localhost:3000/api/clientes
 router.put('/clientes', clienteController.updateCliente);
 
-// ==> DELETE http://localhost:3000/api/clientes
-router.delete('/clientes', clienteController.deleteCliente);
+// ==> DELETE http://localhost:3000/api/clientes/id
+router.delete('/clientes/:id', clienteController.deleteCliente);
 
 module.exports = router;
