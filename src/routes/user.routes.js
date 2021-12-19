@@ -9,13 +9,19 @@ router.get('/users', userController.listAllUsers);
 // ==> GET http://localhost:3000/api/users/id
 router.get('/users/:id', userController.listOneUser);
 
-// ==> POST http://localhost:3000/api/users
-router.post('/users', userController.createUser);
+// ==> POST http://localhost:3000/api/users/admin
+router.post('/users/admin', userController.createAdminUser);
 
-// ==> PUT http://localhost:3000/api/users
-router.put('/users', userController.updateUser);
+// ==> POST http://localhost:3000/api/users/regular
+router.post('/users/regular', userController.createRegularUser);
+
+// ==> PUT http://localhost:3000/api/users/admin
+router.put('/users/admin', userController.updateUserAdmin);
+
+// ==> PUT http://localhost:3000/api/users/regular
+router.put('/users/regular', userController.updateUserRegular);
 
 // ==> DELETE http://localhost:3000/api/users
-router.delete('/users', userController.deleteUser);
+router.delete('/users/:id', userController.deleteUser);
 
 module.exports = router;
