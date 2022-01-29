@@ -15,7 +15,7 @@ exports.createRegularUser = async (req, res) => {
       (err, results) => {
         if (err || results.affectedRows === 0) {
           res.status(500).send({
-            developMessage: err.message,
+            developMessage: err,
             userMessage: 'Falha ao criar o Usuário.',
           });
           return false;

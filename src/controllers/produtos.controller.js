@@ -116,7 +116,7 @@ exports.listOneProduto = async (req, res) => {
           });
           return false;
         }
-        res.status(200).send({ produto: results });
+        res.status(200).send({ produto: results[0] });
       });
   } catch (error) {
     console.error('listOneProduto', error);
