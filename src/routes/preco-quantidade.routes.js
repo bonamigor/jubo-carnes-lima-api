@@ -7,6 +7,6 @@ const precoQuantidadeController = require('../controllers/preco-quantidade.contr
 router.get('/estantes/:id/produtos/preco-quantidade', precoQuantidadeController.listarDetalhado);
 
 // ==> POST http://localhost:3000/api/estantes/:idEstante/produtos/:idProduto/preco-quantidade
-router.post('/estantes/:idEstante/produtos/:idProduto/preco-quantidade', precoQuantidadeController.AddProdutoNaEstanteComPrecoEQuantidade);
+router.post('/estantes/:idEstante/produtos/:idProduto/preco-quantidade', precoQuantidadeController.addProdutoNaEstanteComPrecoEQuantidade);
 
 module.exports = router;
