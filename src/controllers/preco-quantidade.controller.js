@@ -36,7 +36,7 @@ exports.listarDetalhado = async (req, res) => {
 /* Método que adicionará o produto à uma estante
    porém já com o preço de venda e a quantidade.
  */
-exports.AddProdutoNaEstanteComPrecoEQuantidade = async (req, res) => {
+exports.addProdutoNaEstanteComPrecoEQuantidade = async (req, res) => {
   const { idEstante, idProduto } = req.params;
   const { precoVenda, quantidade } = req.body;
   const insertQueryEstante = 'INSERT INTO estante_produto (estante_id, produto_id, preco_quantidade_id) VALUES (?, ?, ?)';
