@@ -5,7 +5,7 @@ const db = require('../config/database');
 exports.authenticate = async (req, res) => {
   try {
     const { email, senha } = req.body;
-    const selectQuery = 'SELECT id, nome, email, admin FROM users WHERE email = ? AND senha = ?';
+    const selectQuery = 'SELECT id, nome, email, admin, cliente_id as clienteId FROM users WHERE email = ? AND senha = ?';
     const queryData = [email, sha1(senha)];
 
     db.execute(selectQuery, queryData, (err, results) => {
@@ -23,7 +23,7 @@ exports.authenticate = async (req, res) => {
         });
       } else {
         const {
-          userEmail, id, nome, admin,
+          userEmail, id,
         } = results[0];
         const userToken = jwt.sign(
           { userEmail, id },
@@ -31,12 +31,7 @@ exports.authenticate = async (req, res) => {
           { expiresIn: 60 * 60 * 24 },
         );
         res.status(200).send({
-          user: {
-            id,
-            nome,
-            email,
-            admin,
-          },
+          user: results[0],
           token: userToken,
         });
       }

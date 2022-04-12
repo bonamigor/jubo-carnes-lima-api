@@ -92,7 +92,6 @@ exports.updateUserAdmin = async (req, res) => {
 
 // ==> Método que atualizará um usuário específico
 exports.updateUserRegular = async (req, res) => {
-  console.log(req.body);
   const {
     nome, email, senha, clienteId, id,
   } = req.body;
@@ -148,7 +147,7 @@ exports.deleteUser = async (req, res) => {
 // ==> Método que listará todos os usuário
 exports.listAllUsers = async (req, res) => {
   try {
-    db.execute('SELECT id, nome, email, admin, cliente_id FROM users', (err, results) => {
+    db.execute('SELECT users.id, users.nome, users.email, users.admin, clientes.nome as cliente FROM users LEFT JOIN clientes ON clientes.id = cliente_id', (err, results) => {
       if (err) {
         res.status(500).send({
           developMessage: err.message,
@@ -156,7 +155,9 @@ exports.listAllUsers = async (req, res) => {
         });
         return false;
       }
-      res.status(200).send({ users: results });
+      res.status(200).send({
+        users: results,
+      });
     });
   } catch (error) {
     console.error('listAllUsers', error);
@@ -167,7 +168,7 @@ exports.listAllUsers = async (req, res) => {
 // ==> Método que listará um cliente específico
 exports.listOneUser = async (req, res) => {
   try {
-    db.execute('SELECT id, nome, email, senha, admin, cliente_id FROM users WHERE id = ?', [req.params.id], (err, results) => {
+    db.execute('SELECT users.id, users.nome, users.email, users.admin, clientes.nome as cliente FROM users LEFT JOIN clientes ON clientes.id = cliente_id where users.id = ?', [req.params.id], (err, results) => {
       if (err) {
         res.status(500).send({
           developMessage: err.message,

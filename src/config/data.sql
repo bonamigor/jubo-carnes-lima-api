@@ -6,7 +6,8 @@ create table clientes (
 id int not null auto_increment,
 nome varchar(255) not null, 
 cnpj unique varchar(14) not null, 
-endereco varchar(255), 
+endereco varchar(255),
+cep varchar(8),
 email varchar(255), 
 cidade varchar(50), 
 estado varchar(50), 
@@ -58,11 +59,12 @@ create table users (
 
 create table pedidos (
   id int not null auto_increment,
+  status varchar(255),
   data_criacao date not null,
   data_confirmacao date,
   data_cancelamento date,
   data_entrega date,
-  valor_total double not null,
+  valor_total double,
   cliente_id int not null,
   primary key(id),
   foreign key (cliente_id) references clientes(id)

@@ -17,7 +17,6 @@ exports.createProduto = async (req, res) => {
         });
         return false;
       }
-      console.log(results);
       res.status(201).send({
         message: 'Produto criado com sucesso!',
         produto: {
@@ -88,7 +87,7 @@ exports.deleteProduto = async (req, res) => {
 // ==> Método que retorna todos os Produtos cadastrados.
 exports.listAllProdutos = async (req, res) => {
   try {
-    db.execute('SELECT * FROM produtos', (err, results) => {
+    db.execute('SELECT id, nome, preco_custo as preco, unidade_medida as unidade FROM produtos', (err, results) => {
       if (err) {
         res.status(500).send({
           developMessage: err.message,

@@ -40,7 +40,6 @@ exports.createEstante = async (req, res) => {
 
 // ==> Método que atualiza uma estante
 exports.updateEstante = async (req, res) => {
-  console.log(req.body);
   const { periodo, clienteId, id } = req.body;
   try {
     const updateQuery = 'UPDATE estantes SET periodo = ?, cliente_id = ? WHERE id = ?';
@@ -91,7 +90,7 @@ exports.deleteEstante = async (req, res) => {
 // ==> Método que retorno a Estante porém sem os dados do Cliente, apenas o ID
 exports.listAllEstantes = async (req, res) => {
   try {
-    db.execute('SELECT * FROM estantes', (err, results) => {
+    db.execute('SELECT estantes.id as id, estantes.cliente_id as clienteId, clientes.nome as cliente, estantes.periodo as periodo, estantes.ativa as ativa FROM estantes INNER JOIN clientes ON estantes.cliente_id = clientes.id', (err, results) => {
       if (err) {
         res.status(500).send({
           developMessage: err.message,
@@ -110,8 +109,8 @@ exports.listAllEstantes = async (req, res) => {
 // ==> Método que retorna a Estante com os Dados do Cliente (Nome);
 exports.listAllEstantesCliente = async (req, res) => {
   try {
-    const selectQuery = 'SELECT estantes.id, periodo, clientes.nome, estantes.ativa FROM estantes INNER JOIN clientes ON estantes.cliente_id = clientes.id';
-    db.execute(selectQuery, (err, results) => {
+    const selectQuery = 'SELECT estantes.id, periodo, clientes.id as clienteId, clientes.nome as cliente, estantes.ativa FROM estantes INNER JOIN clientes ON estantes.cliente_id = clientes.id where cliente_id = ? and ativa = 1';
+    db.execute(selectQuery, [req.params.id], (err, results) => {
       if (err) {
         res.status(500).send({
           developMessage: err.message,

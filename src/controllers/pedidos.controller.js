@@ -10,19 +10,21 @@ exports.createPedido = async (req, res) => {
     const insertQuery = 'INSERT INTO pedidos (data_criacao, status, cliente_id) VALUES (?, ?, ?)';
     db.execute(insertQuery, [dataCriacao, 'CRIADO', clienteId],
       (err, results) => {
-        if (err || results.affectedRows === 0) {
-          res.status(500).send({
-            developMessage: err.message,
-            userMessage: 'Falha ao criar o Pedido.',
+        db.execute('SELECT MAX (id) as id FROM pedidos', (erros, resultados) => {
+          if (err || erros) {
+            res.status(500).send({
+              developMessage: err.message,
+              userMessage: 'Falha ao criar o Pedido.',
+            });
+            return false;
+          }
+          res.status(201).send({
+            message: 'Pedido criado com sucesso!',
+            pedido: {
+              pedidoId: resultados[0].id, status: 'CRIADO', dataCriacao, clienteId,
+            },
+            affectedRows: results.affectedRows,
           });
-          return false;
-        }
-        res.status(201).send({
-          message: 'Pedido criado com sucesso!',
-          pedido: {
-            dataCriacao, clienteId,
-          },
-          affectedRows: results.affectedRows,
         });
       });
   } catch (error) {
@@ -176,7 +178,7 @@ exports.deletePedido = async (req, res) => {
   }
 };
 
-// ==> Método que listará todos os clientes
+// ==> Método que listará todos os pedidos
 exports.listAllPedidos = async (req, res) => {
   try {
     db.execute('SELECT * FROM pedidos', (err, results) => {
@@ -195,11 +197,51 @@ exports.listAllPedidos = async (req, res) => {
   }
 };
 
-// ==> Método que listará um cliente específico
+// ==> Método que listará um pedido específico
 exports.listOnePedido = async (req, res) => {
   const { pedidoId } = req.params;
   try {
     db.execute('SELECT * FROM pedidos WHERE id = ?', [pedidoId], (err, results) => {
+      if (err) {
+        res.status(500).send({
+          developMessage: err.message,
+          userMessage: 'Falha ao listar o Pedido.',
+        });
+        return false;
+      }
+      res.status(200).send({ pedido: results });
+    });
+  } catch (error) {
+    console.error('listOnePedido', error);
+    res.status(500).send({ message: 'Ocorreu um erro ao listar o Pedido.' });
+  }
+};
+
+// ==> Método que listará todos os pedidos
+exports.listAllPedidosByCliente = async (req, res) => {
+  const { clienteId } = req.body;
+  try {
+    db.execute('SELECT * FROM pedidos where clienteId = ?', [clienteId], (err, results) => {
+      if (err) {
+        res.status(500).send({
+          developMessage: err.message,
+          userMessage: 'Falha ao listar os pedidos.',
+        });
+        return false;
+      }
+      res.status(200).send({ pedidos: results });
+    });
+  } catch (error) {
+    console.error('listAllPedidos', error);
+    res.status(500).send({ message: 'Ocorreu um erro ao listar os pedidos.' });
+  }
+};
+
+// ==> Método que listará um pedido específico
+exports.listOnePedidoByCliente = async (req, res) => {
+  const { pedidoId, clienteId } = req.body;
+  try {
+    db.execute('SELECT * FROM pedidos WHERE clienteId = ? AND pedidoId = ?', [clienteId, pedidoId], (err, results) => {
       if (err) {
         res.status(500).send({
           developMessage: err.message,

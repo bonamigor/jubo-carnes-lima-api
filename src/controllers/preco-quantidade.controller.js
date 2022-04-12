@@ -9,9 +9,9 @@ const db = require('../config/database');
 */
 exports.listarDetalhado = async (req, res) => {
   try {
-    const selectQuery = `SELECT produtos.nome AS nome,
-    produtos.preco_custo, produtos.unidade_medida,
-    preco_quantidade.preco_venda, preco_quantidade.quantidade
+    const selectQuery = `SELECT produto_id as produtoId, produtos.nome AS nome,
+    produtos.preco_custo as precoCusto, produtos.unidade_medida as unidade,
+    preco_quantidade.preco_venda as precoVenda, preco_quantidade.quantidade
     FROM estante_produto
     INNER JOIN produtos ON estante_produto.produto_id = produtos.id
     INNER JOIN preco_quantidade ON estante_produto.preco_quantidade_id = preco_quantidade.id
@@ -37,6 +37,8 @@ exports.listarDetalhado = async (req, res) => {
    porém já com o preço de venda e a quantidade.
  */
 exports.addProdutoNaEstanteComPrecoEQuantidade = async (req, res) => {
+  console.log('Params', req.params);
+  console.log('Body', req.body);
   const { idEstante, idProduto } = req.params;
   const { precoVenda, quantidade } = req.body;
   const insertQueryEstante = 'INSERT INTO estante_produto (estante_id, produto_id, preco_quantidade_id) VALUES (?, ?, ?)';
@@ -45,7 +47,7 @@ exports.addProdutoNaEstanteComPrecoEQuantidade = async (req, res) => {
     db.execute(insertQueryPreco, [precoVenda, quantidade], (err, result) => {
       if (err || !result.affectedRows) {
         res.status(500).send({
-          developMessage: err.message,
+          developMessage: err,
           userMessage: 'Falha ao adicionar o Produto da Estante.',
         });
         return false;

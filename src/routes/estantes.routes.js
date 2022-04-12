@@ -10,7 +10,7 @@ router.get('/estantes', estanteController.listAllEstantes);
 router.get('/estantes/:id', estanteController.listOneEstante);
 
 // ==> GET http://localhost:3000/api/estantes-cliente
-router.get('/estantes-cliente', estanteController.listAllEstantesCliente);
+router.get('/cliente/:id/estantes', estanteController.listAllEstantesCliente);
 
 // ==> POST http://localhost:3000/api/estantes
 router.post('/estantes', estanteController.createEstante);
