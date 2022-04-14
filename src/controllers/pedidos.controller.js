@@ -258,8 +258,8 @@ exports.listOnePedidoByCliente = async (req, res) => {
 };
 
 exports.calculaValorTotal = async (req, res) => {
-  const pedidoId = req.params.pedido_id;
-  const selectQuery = 'SELECT SUM(preco_total) FROM item_pedido WHERE pedido_id = ?;';
+  const { pedidoId } = req.params;
+  const selectQuery = 'SELECT SUM(preco_total) as totalPedido FROM item_pedido WHERE pedido_id = ?;';
   try {
     db.execute(selectQuery, [pedidoId], (err, results) => {
       if (err) {
@@ -270,10 +270,34 @@ exports.calculaValorTotal = async (req, res) => {
         return false;
       }
 
-      res.status(200).send({ valorTotal: results });
+      res.status(200).send(results[0]);
     });
   } catch (error) {
     console.error('calculaValorTotal', error);
+    res.status(500).send({ message: 'Ocorreu um erro ao calcular o valor total do Pedido.' });
+  }
+};
+
+exports.recuperarProdutosNoPedido = async (req, res) => {
+  const { pedidoId } = req.params;
+  const selectQuery = `select produtos.nome as nome, produtos.unidade_medida as unidade, item_pedido.quantidade as quantidade, preco_quantidade.preco_venda as precoVenda, item_pedido.preco_total as total from estante_produto
+  inner join produtos on produtos.id = estante_produto.produto_id
+  inner join preco_quantidade on preco_quantidade.id = estante_produto.preco_quantidade_id
+  inner join item_pedido on item_pedido.produto_id = estante_produto.produto_id
+  where item_pedido.pedido_id = ?`;
+  try {
+    db.execute(selectQuery, [pedidoId], (err, results) => {
+      if (err) {
+        res.status(500).send({
+          developMessage: err.message,
+          userMessage: 'Falha ao calcular o valor total do Pedido.',
+        });
+        return false;
+      }
+
+      res.status(200).send({ produtos: results });
+    });
+  } catch (error) {
     res.status(500).send({ message: 'Ocorreu um erro ao calcular o valor total do Pedido.' });
   }
 };

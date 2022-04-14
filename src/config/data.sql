@@ -5,7 +5,7 @@ create database jubo;
 create table clientes (
 id int not null auto_increment,
 nome varchar(255) not null, 
-cnpj unique varchar(14) not null, 
+cnpj varchar(14) unique not null, 
 endereco varchar(255),
 cep varchar(8),
 email varchar(255), 
