@@ -19,7 +19,8 @@ primary key(id)
 create table estantes (
 id int not null auto_increment, 
 periodo varchar(7) not null, 
-cliente_id int not null, 
+observacao varchar(255),
+cliente_id int not null,
 ativa tinyint,
 primary key (id), 
 foreign key (cliente_id) references clientes(id));
@@ -65,6 +66,7 @@ create table pedidos (
   data_cancelamento date,
   data_entrega date,
   valor_total double,
+  entregue tinyint,
   cliente_id int not null,
   primary key(id),
   foreign key (cliente_id) references clientes(id)

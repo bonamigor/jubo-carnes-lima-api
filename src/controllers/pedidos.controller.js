@@ -302,7 +302,7 @@ exports.calculaValorTotal = async (req, res) => {
 
 exports.recuperarProdutosNoPedido = async (req, res) => {
   const { pedidoId, estanteId } = req.params;
-  const selectQuery = `select item_pedido.id as id, produtos.nome as nome, produtos.unidade_medida as unidade, preco_quantidade.preco_venda as precoVenda, item_pedido.quantidade as quantidade, item_pedido.preco_total as total from estante_produto
+  const selectQuery = `select item_pedido.id as itemPedidoId, produtos.id as produtoId, produtos.nome as nome, produtos.unidade_medida as unidade, preco_quantidade.preco_venda as precoVenda, item_pedido.quantidade as quantidade, item_pedido.preco_total as total from estante_produto
   inner join produtos on produtos.id = estante_produto.produto_id
   inner join preco_quantidade on preco_quantidade.id = estante_produto.preco_quantidade_id
   inner join item_pedido on item_pedido.produto_id = estante_produto.produto_id
@@ -321,5 +321,25 @@ exports.recuperarProdutosNoPedido = async (req, res) => {
     });
   } catch (error) {
     res.status(500).send({ message: 'Ocorreu um erro ao calcular o valor total do Pedido.' });
+  }
+};
+
+exports.recuperarUltimoPedidoByCliente = async (req, res) => {
+  const { clienteId } = req.params;
+  const selectQuery = 'SELECT id, data_criacao as dataCriacao, valor_total as total, status FROM pedidos WHERE id=(SELECT MAX(id) FROM pedidos WHERE cliente_id = ?)';
+  try {
+    db.execute(selectQuery, [clienteId], (error, results) => {
+      if (error) {
+        res.status(500).send({
+          developMessage: error.message,
+          userMessage: 'Falha ao ao recuperar o último pedido desse Cliente.',
+        });
+        return false;
+      }
+
+      res.status(200).send({ pedido: results[0] });
+    });
+  } catch (error) {
+    res.status(500).send({ message: 'Ocorreu um erro ao recuperar o último pedido desse Cliente.' });
   }
 };

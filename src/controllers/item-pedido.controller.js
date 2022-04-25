@@ -37,7 +37,7 @@ exports.atualizaItemNoPedido = async (req, res) => {
   const { pedidoId, itemPedidoId } = req.params;
   // Essa Query recupera o Preço de Venda do Produto para poder calcular o preço total.
   const selectQuery = 'SELECT preco_venda FROM estante_produto INNER JOIN preco_quantidade ON estante_produto.preco_quantidade_id = preco_quantidade.id WHERE estante_produto.estante_id = ? AND estante_produto.produto_id = ?';
-  const updateQuery = 'UPDATE item_pedido SET pedido_id = ?, produto_id = ?, item_quantidade = ?, preco_total = ? WHERE id = ?';
+  const updateQuery = 'UPDATE item_pedido SET pedido_id = ?, produto_id = ?, quantidade = ?, preco_total = ? WHERE id = ?';
   db.execute(selectQuery, [estanteId, produtoId], (err, results) => {
     if (err) {
       console.error(err);

@@ -31,4 +31,6 @@ router.get('/pedidos/:pedidoId/estante/:estanteId/produtos', pedidosController.r
 
 router.get('/pedidos/:pedidoId/valorTotal', pedidosController.calculaValorTotal);
 
+router.get('/pedidos/ultimo/:clienteId', pedidosController.recuperarUltimoPedidoByCliente);
+
 module.exports = router;
