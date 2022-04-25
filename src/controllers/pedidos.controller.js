@@ -153,7 +153,7 @@ exports.deletePedido = async (req, res) => {
       [pedidoId], (err, results) => {
         if (err || results.affectedRows === 0) {
           res.status(500).send({
-            developMessage: err.message,
+            developMessage: err,
             userMessage: 'Falha ao deletar o itens do Pedido.',
           });
           return false;
@@ -180,8 +180,9 @@ exports.deletePedido = async (req, res) => {
 
 // ==> Método que listará todos os pedidos
 exports.listAllPedidos = async (req, res) => {
+  const selectQuery = 'SELECT pedidos.id AS id, pedidos.data_criacao AS dataCriacao, pedidos.valor_total AS valorTotal, clientes.nome AS nome, clientes.cidade AS cidade, clientes.estado AS estado FROM pedidos INNER JOIN clientes ON clientes.id = pedidos.cliente_id';
   try {
-    db.execute('SELECT * FROM pedidos', (err, results) => {
+    db.execute(selectQuery, (err, results) => {
       if (err) {
         res.status(500).send({
           developMessage: err.message,
@@ -193,6 +194,27 @@ exports.listAllPedidos = async (req, res) => {
     });
   } catch (error) {
     console.error('listAllPedidos', error);
+    res.status(500).send({ message: 'Ocorreu um erro ao listar os pedidos.' });
+  }
+};
+
+// ==> Método que listará todos os pedidos para entregar amanhã
+exports.listAllTomorrowPedidos = async (req, res) => {
+  const dataEntrega = new Date().setDate(new Date() + 1);
+  const selectQuery = 'SELECT pedidos.id AS id, pedidos.data_criacao AS dataCriacao, pedidos.valor_total AS valorTotal, clientes.nome AS nome, clientes.cidade AS cidade, clientes.estado AS estado FROM pedidos INNER JOIN clientes ON clientes.id = pedidos.cliente_id where pedidos.data_entrega = ?';
+  try {
+    db.execute(selectQuery, [dataEntrega], (err, results) => {
+      if (err) {
+        res.status(500).send({
+          developMessage: err.message,
+          userMessage: 'Falha ao listar os pedidos.',
+        });
+        return false;
+      }
+      res.status(200).send({ pedidos: results });
+    });
+  } catch (error) {
+    console.error('listAllTomorrowPedidos', error);
     res.status(500).send({ message: 'Ocorreu um erro ao listar os pedidos.' });
   }
 };
@@ -279,14 +301,14 @@ exports.calculaValorTotal = async (req, res) => {
 };
 
 exports.recuperarProdutosNoPedido = async (req, res) => {
-  const { pedidoId } = req.params;
-  const selectQuery = `select produtos.nome as nome, produtos.unidade_medida as unidade, item_pedido.quantidade as quantidade, preco_quantidade.preco_venda as precoVenda, item_pedido.preco_total as total from estante_produto
+  const { pedidoId, estanteId } = req.params;
+  const selectQuery = `select item_pedido.id as id, produtos.nome as nome, produtos.unidade_medida as unidade, preco_quantidade.preco_venda as precoVenda, item_pedido.quantidade as quantidade, item_pedido.preco_total as total from estante_produto
   inner join produtos on produtos.id = estante_produto.produto_id
   inner join preco_quantidade on preco_quantidade.id = estante_produto.preco_quantidade_id
   inner join item_pedido on item_pedido.produto_id = estante_produto.produto_id
-  where item_pedido.pedido_id = ?`;
+  where item_pedido.pedido_id = ? and estante_produto.estante_id = ?`;
   try {
-    db.execute(selectQuery, [pedidoId], (err, results) => {
+    db.execute(selectQuery, [pedidoId, estanteId], (err, results) => {
       if (err) {
         res.status(500).send({
           developMessage: err.message,

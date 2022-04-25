@@ -6,6 +6,9 @@ const pedidosController = require('../controllers/pedidos.controller');
 // ==> GET http://localhost:3000/api/pedidos
 router.get('/pedidos', pedidosController.listAllPedidos);
 
+// ==> GET http://localhost:3000/api/pedidos
+router.get('/pedidos/amanha', pedidosController.listAllTomorrowPedidos);
+
 // ==> GET http://localhost:3000/api/pedidos/id
 router.get('/pedidos/:pedidoId', pedidosController.listOnePedido);
 
@@ -24,7 +27,7 @@ router.post('/pedidos', pedidosController.createPedido);
 // ==> DELETE http://localhost:3000/api/pedidos
 router.delete('/pedidos/:pedidoId', pedidosController.deletePedido);
 
-router.get('/pedidos/:pedidoId/produtos', pedidosController.recuperarProdutosNoPedido);
+router.get('/pedidos/:pedidoId/estante/:estanteId/produtos', pedidosController.recuperarProdutosNoPedido);
 
 router.get('/pedidos/:pedidoId/valorTotal', pedidosController.calculaValorTotal);
 

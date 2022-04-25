@@ -97,16 +97,40 @@ exports.atualizaQuantidadeAoAtualizar = async (req, res) => {
   try {
     db.query(selectQuery, (erro, result) => {
       const precoQuantidadeId = result[0].preco_quantidade_id;
-      console.log(precoQuantidadeId);
       db.execute(quantidadeQuery, [precoQuantidadeId], (error, results) => {
         const quantidadeAtualizada = results[0].quantidade - quantidade;
-        console.log(quantidadeAtualizada);
         db.execute(updateQuery, [quantidadeAtualizada, precoQuantidadeId]);
       });
     });
   } catch (error) {
     res.status(500).send({
       message: 'Ocorreu um erro ao atualizar a quantidade do Produto.',
+      erro: error,
+    });
+  }
+};
+
+exports.deletarItemPedido = async (req, res) => {
+  try {
+    const { itemPedidoId } = req.params;
+    const deleteQuery = 'DELETE FROM item_pedido where item_pedido.id = ?';
+
+    db.execute(deleteQuery, [itemPedidoId], (error, results) => {
+      if (error) {
+        res.status(500).send({
+          developMessage: error.message,
+          userMessage: 'Ocorreu um erro ao Excluir o Item do Pedido..',
+        });
+        return false;
+      }
+      res.status(200).send({
+        message: 'Item excluído do Pedido com sucesso!',
+        affectedRows: results.affectedRows,
+      });
+    });
+  } catch (error) {
+    res.status(500).send({
+      message: 'Ocorreu um erro ao Excluir o Item do Pedido.',
       erro: error,
     });
   }

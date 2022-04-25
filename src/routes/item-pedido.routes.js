@@ -9,4 +9,7 @@ router.post('/pedido/:pedidoId/adicionar', itemPedidoController.adicionarItemAoP
 // ==> PUT http://localhost:3000/api/pedido/pedidoId/atualizar/itemPedidoId
 router.put('/pedido/:pedidoId/atualizar/:itemPedidoId', itemPedidoController.atualizaItemNoPedido);
 
+// ==> DELETE http://localhost:3000/api/pedido/itemPedidoId
+router.delete('/pedido/item-pedido/:itemPedidoId', itemPedidoController.deletarItemPedido);
+
 module.exports = router;
