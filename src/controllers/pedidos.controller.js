@@ -35,13 +35,15 @@ exports.createPedido = async (req, res) => {
 
 // ==> Método que atualizará a data de confirmação e o status
 exports.confirmaPedido = async (req, res) => {
+  console.log(req.body);
+  const { dataEntrega } = req.body;
   const { pedidoId } = req.params;
   const dataConfirmacao = new Date();
   const status = 'CONFIRMADO';
   try {
-    const updateQuery = 'UPDATE pedidos SET data_confirmacao = ?, status = ? WHERE id = ?';
+    const updateQuery = 'UPDATE pedidos SET data_confirmacao = ?, data_entrega = ?, status = ? WHERE id = ?';
     db.execute(updateQuery,
-      [dataConfirmacao, status, pedidoId],
+      [dataConfirmacao, dataEntrega, status, pedidoId],
       (err, results) => {
         if (err) {
           res.status(500).send({
@@ -149,29 +151,19 @@ exports.cancelaPedido = async (req, res) => {
 exports.deletePedido = async (req, res) => {
   const { pedidoId } = req.params;
   try {
-    db.execute('DELETE FROM item_pedido WHERE pedido_id = ?',
-      [pedidoId], (err, results) => {
-        if (err || results.affectedRows === 0) {
-          res.status(500).send({
-            developMessage: err,
-            userMessage: 'Falha ao deletar o itens do Pedido.',
-          });
-          return false;
-        }
-        db.execute('DELETE FROM pedidos WHERE id = ?', [pedidoId], (erro, result) => {
-          if (erro || result.affectedRows === 0) {
-            res.status(500).send({
-              developMessage: erro.sqlMessage,
-              userMessage: 'Falha ao deletar o Pedido.',
-            });
-            return false;
-          }
-          res.status(200).send({
-            message: 'Pedido excluído com sucesso!',
-            affectedRows: result.affectedRows,
-          });
+    db.execute('DELETE FROM pedidos WHERE id = ?', [pedidoId], (erro, result) => {
+      if (erro || result.affectedRows === 0) {
+        res.status(500).send({
+          developMessage: erro.sqlMessage,
+          userMessage: 'Falha ao deletar o Pedido.',
         });
+        return false;
+      }
+      res.status(200).send({
+        message: 'Pedido excluído com sucesso!',
+        affectedRows: result.affectedRows,
       });
+    });
   } catch (error) {
     console.error('deleteCliente', error);
     res.status(500).send({ message: 'Ocorreu um erro ao excluir o Cliente.' });
@@ -180,7 +172,7 @@ exports.deletePedido = async (req, res) => {
 
 // ==> Método que listará todos os pedidos
 exports.listAllPedidos = async (req, res) => {
-  const selectQuery = 'SELECT pedidos.id AS id, pedidos.data_criacao AS dataCriacao, pedidos.valor_total AS valorTotal, clientes.nome AS nome, clientes.cidade AS cidade, clientes.estado AS estado FROM pedidos INNER JOIN clientes ON clientes.id = pedidos.cliente_id';
+  const selectQuery = 'SELECT pedidos.id AS id, pedidos.data_criacao AS dataCriacao, pedidos.valor_total AS valorTotal, clientes.nome AS nome, clientes.cidade AS cidade, clientes.estado AS estado FROM pedidos INNER JOIN clientes ON clientes.id = pedidos.cliente_id WHERE pedidos.status = "CRIADO"';
   try {
     db.execute(selectQuery, (err, results) => {
       if (err) {
@@ -301,14 +293,14 @@ exports.calculaValorTotal = async (req, res) => {
 };
 
 exports.recuperarProdutosNoPedido = async (req, res) => {
-  const { pedidoId, estanteId } = req.params;
+  const { pedidoId } = req.params;
   const selectQuery = `select item_pedido.id as itemPedidoId, produtos.id as produtoId, produtos.nome as nome, produtos.unidade_medida as unidade, preco_quantidade.preco_venda as precoVenda, item_pedido.quantidade as quantidade, item_pedido.preco_total as total from estante_produto
   inner join produtos on produtos.id = estante_produto.produto_id
   inner join preco_quantidade on preco_quantidade.id = estante_produto.preco_quantidade_id
   inner join item_pedido on item_pedido.produto_id = estante_produto.produto_id
-  where item_pedido.pedido_id = ? and estante_produto.estante_id = ?`;
+  where item_pedido.pedido_id = ? and estante_produto.estante_id = item_pedido.estante_id;`;
   try {
-    db.execute(selectQuery, [pedidoId, estanteId], (err, results) => {
+    db.execute(selectQuery, [pedidoId], (err, results) => {
       if (err) {
         res.status(500).send({
           developMessage: err.message,

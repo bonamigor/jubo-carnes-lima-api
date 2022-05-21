@@ -69,3 +69,28 @@ exports.addProdutoNaEstanteComPrecoEQuantidade = async (req, res) => {
     res.status(500).send({ message: 'Ocorreu um erro ao add os produtos na estante.' });
   }
 };
+
+exports.atualizarPrecoQuantidade = async (req, res) => {
+  const { idEstante, idProduto } = req.params;
+  const { precoVenda, quantidade } = req.body;
+
+  try {
+    const updateQuery = 'UPDATE preco_quantidade SET preco_venda = ?, quantidade = ? WHERE id = ((SELECT preco_quantidade_id FROM estante_produto WHERE estante_id = ? AND produto_id = ?))';
+    db.execute(updateQuery, [precoVenda, quantidade, idEstante, idProduto], (error, results) => {
+      if (error) {
+        res.status(500).send({
+          developMessage: error.message,
+          userMessage: 'Falha ao atualizar o Produto da Estante.',
+        });
+        return false;
+      }
+      res.status(201).send({
+        message: `Produto de ID ${idProduto} atualizado na Estante de ID ${idEstante}`,
+        affectedRows: results.affectedRows,
+      });
+    });
+  } catch (error) {
+    console.error('atualizarPrecoQuantidade', error);
+    res.status(500).send({ message: 'Ocorreu um erro ao atualizar o produto na estante.' });
+  }
+};

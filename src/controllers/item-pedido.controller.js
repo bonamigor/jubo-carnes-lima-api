@@ -6,14 +6,14 @@ exports.adicionarItemAoPedido = async (req, res) => {
   const numberPedidoId = Number(pedidoId);
   // Essa Query recupera o Preço de Venda do Produto para poder calcular o preço total.
   const selectQuery = 'SELECT preco_venda FROM estante_produto INNER JOIN preco_quantidade ON estante_produto.preco_quantidade_id = preco_quantidade.id WHERE estante_produto.estante_id = ? AND estante_produto.produto_id = ?';
-  const insertQuery = 'INSERT INTO item_pedido (pedido_id, produto_id, quantidade, preco_total) VALUES (?, ?, ?, ?)';
+  const insertQuery = 'INSERT INTO item_pedido (pedido_id, produto_id, estante_id, quantidade, preco_total) VALUES (?, ?, ?, ?, ?)';
   db.execute(selectQuery, [estanteId, produtoId], (err, results) => {
     if (err) {
       console.error(err);
     }
     const precoTotal = results[0].preco_venda * quantidade;
     db.execute(insertQuery,
-      [numberPedidoId, produtoId, quantidade, precoTotal],
+      [numberPedidoId, produtoId, estanteId, quantidade, precoTotal],
       (error, result) => {
         if (error || result.affectedRows === 0) {
           res.status(500).send({

@@ -27,7 +27,7 @@ router.post('/pedidos', pedidosController.createPedido);
 // ==> DELETE http://localhost:3000/api/pedidos
 router.delete('/pedidos/:pedidoId', pedidosController.deletePedido);
 
-router.get('/pedidos/:pedidoId/estante/:estanteId/produtos', pedidosController.recuperarProdutosNoPedido);
+router.get('/pedidos/:pedidoId/produtos', pedidosController.recuperarProdutosNoPedido);
 
 router.get('/pedidos/:pedidoId/valorTotal', pedidosController.calculaValorTotal);
 
