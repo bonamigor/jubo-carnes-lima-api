@@ -9,7 +9,7 @@ const app = express();
 // ==> Rotas da API
 const index = require('./routes/index');
 
-const exclusions = ['/api/autenticacao'];
+const exclusions = ['/api/autenticacao', '/api/users'];
 
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
