@@ -33,4 +33,6 @@ router.get('/pedidos/:pedidoId/valorTotal', pedidosController.calculaValorTotal)
 
 router.get('/pedidos/ultimo/:clienteId', pedidosController.recuperarUltimoPedidoByCliente);
 
+router.get('/pedidos/cliente/:clienteId', pedidosController.recuperarPedidosByCliente);
+
 module.exports = router;

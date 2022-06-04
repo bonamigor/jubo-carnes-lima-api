@@ -172,7 +172,7 @@ exports.deletePedido = async (req, res) => {
 
 // ==> Método que listará todos os pedidos
 exports.listAllPedidos = async (req, res) => {
-  const selectQuery = 'SELECT pedidos.id AS id, pedidos.data_criacao AS dataCriacao, pedidos.valor_total AS valorTotal, clientes.nome AS nome, clientes.endereco AS endereco, clientes.cidade AS cidade, clientes.estado AS estado, clientes.telefone AS telefone FROM pedidos INNER JOIN clientes ON clientes.id = pedidos.cliente_id WHERE pedidos.status = "CRIADO"';
+  const selectQuery = 'SELECT pedidos.id AS id, pedidos.data_criacao AS dataCriacao, pedidos.valor_total AS valorTotal, pedidos.status as status, clientes.nome AS nome, clientes.endereco AS endereco, clientes.cidade AS cidade, clientes.estado AS estado, clientes.telefone AS telefone FROM pedidos INNER JOIN clientes ON clientes.id = pedidos.cliente_id WHERE pedidos.status = "CRIADO"';
   try {
     db.execute(selectQuery, (err, results) => {
       if (err) {
@@ -318,7 +318,7 @@ exports.recuperarProdutosNoPedido = async (req, res) => {
 
 exports.recuperarUltimoPedidoByCliente = async (req, res) => {
   const { clienteId } = req.params;
-  const selectQuery = 'SELECT id, data_criacao as dataCriacao, valor_total as total, status FROM pedidos WHERE id=(SELECT MAX(id) FROM pedidos WHERE cliente_id = ?)';
+  const selectQuery = 'SELECT pedidos.id AS id, pedidos.data_criacao AS dataCriacao, pedidos.valor_total AS valorTotal, pedidos.status as status, clientes.nome AS nome, clientes.endereco AS endereco, clientes.cidade AS cidade, clientes.estado AS estado, clientes.telefone AS telefone FROM pedidos INNER JOIN clientes ON clientes.id = pedidos.cliente_id WHERE pedidos.id=(SELECT MAX(pedidos.id) FROM pedidos WHERE cliente_id = ?)';
   try {
     db.execute(selectQuery, [clienteId], (error, results) => {
       if (error) {
@@ -330,6 +330,26 @@ exports.recuperarUltimoPedidoByCliente = async (req, res) => {
       }
 
       res.status(200).send({ pedido: results[0] });
+    });
+  } catch (error) {
+    res.status(500).send({ message: 'Ocorreu um erro ao recuperar o último pedido desse Cliente.' });
+  }
+};
+
+exports.recuperarPedidosByCliente = async (req, res) => {
+  const { clienteId } = req.params;
+  const selectQuery = 'SELECT pedidos.id AS id, pedidos.data_criacao AS dataCriacao, pedidos.valor_total AS valorTotal, pedidos.status as status, clientes.nome AS nome, clientes.endereco AS endereco, clientes.cidade AS cidade, clientes.estado AS estado, clientes.telefone AS telefone FROM pedidos INNER JOIN clientes ON clientes.id = pedidos.cliente_id WHERE pedidos.cliente_id = ?';
+  try {
+    db.execute(selectQuery, [clienteId], (error, results) => {
+      if (error) {
+        res.status(500).send({
+          developMessage: error.message,
+          userMessage: 'Falha ao ao recuperar o último pedido desse Cliente.',
+        });
+        return false;
+      }
+
+      res.status(200).send({ pedidos: results });
     });
   } catch (error) {
     res.status(500).send({ message: 'Ocorreu um erro ao recuperar o último pedido desse Cliente.' });

@@ -5,13 +5,13 @@ create database jubo;
 create table clientes (
 id int not null auto_increment,
 nome varchar(255) not null, 
-cnpj varchar(14) unique not null, 
+cnpj varchar(255) unique not null, 
 endereco varchar(255),
-cep varchar(8),
+cep varchar(255),
 email varchar(255), 
-cidade varchar(50), 
-estado varchar(50), 
-telefone varchar(11), 
+cidade varchar(255), 
+estado varchar(255), 
+telefone varchar(255), 
 ativo tinyint, 
 primary key(id)
 );
