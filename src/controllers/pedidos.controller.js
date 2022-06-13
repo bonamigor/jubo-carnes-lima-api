@@ -318,13 +318,13 @@ exports.recuperarProdutosNoPedido = async (req, res) => {
 
 exports.recuperarUltimoPedidoByCliente = async (req, res) => {
   const { clienteId } = req.params;
-  const selectQuery = 'SELECT pedidos.id AS id, pedidos.data_criacao AS dataCriacao, pedidos.valor_total AS valorTotal, pedidos.status as status, clientes.nome AS nome, clientes.endereco AS endereco, clientes.cidade AS cidade, clientes.estado AS estado, clientes.telefone AS telefone FROM pedidos INNER JOIN clientes ON clientes.id = pedidos.cliente_id WHERE pedidos.id=(SELECT MAX(pedidos.id) FROM pedidos WHERE cliente_id = ?)';
+  const selectQuery = 'SELECT pedidos.id AS id, pedidos.data_criacao AS dataCriacao, pedidos.data_entrega AS dataEntrega, pedidos.valor_total AS valorTotal, pedidos.status as status, clientes.nome AS nome, clientes.endereco AS endereco, clientes.cidade AS cidade, clientes.estado AS estado, clientes.telefone AS telefone FROM pedidos INNER JOIN clientes ON clientes.id = pedidos.cliente_id WHERE pedidos.id=(SELECT MAX(pedidos.id) FROM pedidos WHERE cliente_id = ?)';
   try {
     db.execute(selectQuery, [clienteId], (error, results) => {
       if (error) {
         res.status(500).send({
           developMessage: error.message,
-          userMessage: 'Falha ao ao recuperar o último pedido desse Cliente.',
+          userMessage: 'Falha ao recuperar o último pedido desse Cliente.',
         });
         return false;
       }
@@ -338,13 +338,13 @@ exports.recuperarUltimoPedidoByCliente = async (req, res) => {
 
 exports.recuperarPedidosByCliente = async (req, res) => {
   const { clienteId } = req.params;
-  const selectQuery = 'SELECT pedidos.id AS id, pedidos.data_criacao AS dataCriacao, pedidos.valor_total AS valorTotal, pedidos.status as status, clientes.nome AS nome, clientes.endereco AS endereco, clientes.cidade AS cidade, clientes.estado AS estado, clientes.telefone AS telefone FROM pedidos INNER JOIN clientes ON clientes.id = pedidos.cliente_id WHERE pedidos.cliente_id = ?';
+  const selectQuery = 'SELECT pedidos.id AS id, pedidos.data_criacao AS dataCriacao, pedidos.data_entrega AS dataEntrega, pedidos.valor_total AS valorTotal, pedidos.status as status, clientes.nome AS nome, clientes.endereco AS endereco, clientes.cidade AS cidade, clientes.estado AS estado, clientes.telefone AS telefone FROM pedidos INNER JOIN clientes ON clientes.id = pedidos.cliente_id WHERE pedidos.cliente_id = ?';
   try {
     db.execute(selectQuery, [clienteId], (error, results) => {
       if (error) {
         res.status(500).send({
           developMessage: error.message,
-          userMessage: 'Falha ao ao recuperar o último pedido desse Cliente.',
+          userMessage: 'Falha ao recuperar os pedidos desse Cliente.',
         });
         return false;
       }

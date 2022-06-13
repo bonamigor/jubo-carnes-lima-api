@@ -46,14 +46,14 @@ exports.addProdutoNaEstanteComPrecoEQuantidade = async (req, res) => {
       if (err || !result.affectedRows) {
         res.status(500).send({
           developMessage: err,
-          userMessage: 'Falha ao adicionar o Produto da Estante.',
+          userMessage: 'Falha ao adicionar o preço/quantidade.',
         });
         return false;
       }
       db.execute(insertQueryEstante, [idEstante, idProduto, result.insertId], (error, results) => {
         if (error) {
           res.status(500).send({
-            developMessage: err.message,
+            developMessage: error,
             userMessage: 'Falha ao adicionar o Produto da Estante.',
           });
           return false;
