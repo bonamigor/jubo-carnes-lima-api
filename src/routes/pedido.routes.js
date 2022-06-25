@@ -21,6 +21,9 @@ router.put('/pedidos/:pedidoId/confirmar', pedidosController.confirmaPedido);
 // ==> PUT http://localhost:3000/api/pedidos/pedidoId/entregar
 router.put('/pedidos/:pedidoId/entregar', pedidosController.entregaPedido);
 
+// ==> PUT http://localhost:3000/api/pedidos/pedidoId/observacao
+router.put('/pedidos/:pedidoId/observacao', pedidosController.adicionarObservacao);
+
 // ==> POST http://localhost:3000/api/pedidos
 router.post('/pedidos', pedidosController.createPedido);
 

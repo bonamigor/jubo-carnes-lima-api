@@ -35,7 +35,6 @@ exports.createPedido = async (req, res) => {
 
 // ==> Método que atualizará a data de confirmação e o status
 exports.confirmaPedido = async (req, res) => {
-  console.log(req.body);
   const { dataEntrega } = req.body;
   const { pedidoId } = req.params;
   const dataConfirmacao = new Date();
@@ -94,6 +93,33 @@ exports.entregaPedido = async (req, res) => {
   } catch (error) {
     console.error('entregaPedido', error);
     res.status(500).send({ message: 'Ocorreu um erro ao confirmar o Pedido.' });
+  }
+};
+
+exports.adicionarObservacao = async (req, res) => {
+  try {
+    const { pedidoId } = req.params;
+    const { observacao } = req.body;
+    const updateQuery = 'UPDATE pedidos SET observacao = ? WHERE id = ?';
+    db.execute(updateQuery, [observacao, pedidoId], (error, results) => {
+      if (error) {
+        res.status(500).send({
+          developMessage: error.message,
+          userMessage: 'Falha ao confirmar ao adicionar a Observação ao Pedido.',
+        });
+        return false;
+      }
+
+      res.status(201).send({
+        message: 'Observação adicionada ao pedido.',
+        pedido: {
+          pedidoId, observacao,
+        },
+        affectedRows: results.affectedRows,
+      });
+    });
+  } catch (error) {
+    res.status(500).send({ message: 'Ocorreu um erro ao adicionar a Observação ao Pedido.' });
   }
 };
 
@@ -172,7 +198,7 @@ exports.deletePedido = async (req, res) => {
 
 // ==> Método que listará todos os pedidos
 exports.listAllPedidos = async (req, res) => {
-  const selectQuery = 'SELECT pedidos.id AS id, pedidos.data_criacao AS dataCriacao, pedidos.valor_total AS valorTotal, pedidos.status as status, clientes.nome AS nome, clientes.endereco AS endereco, clientes.cidade AS cidade, clientes.estado AS estado, clientes.telefone AS telefone FROM pedidos INNER JOIN clientes ON clientes.id = pedidos.cliente_id WHERE pedidos.status = "CRIADO"';
+  const selectQuery = 'SELECT pedidos.id AS id, pedidos.data_criacao AS dataCriacao, pedidos.valor_total AS valorTotal, pedidos.status as status, pedidos.observacao as observacao, clientes.nome AS nome, clientes.endereco AS endereco, clientes.cidade AS cidade, clientes.estado AS estado, clientes.telefone AS telefone FROM pedidos INNER JOIN clientes ON clientes.id = pedidos.cliente_id WHERE pedidos.status = "CRIADO"';
   try {
     db.execute(selectQuery, (err, results) => {
       if (err) {
@@ -318,7 +344,7 @@ exports.recuperarProdutosNoPedido = async (req, res) => {
 
 exports.recuperarUltimoPedidoByCliente = async (req, res) => {
   const { clienteId } = req.params;
-  const selectQuery = 'SELECT pedidos.id AS id, pedidos.data_criacao AS dataCriacao, pedidos.data_entrega AS dataEntrega, pedidos.valor_total AS valorTotal, pedidos.status as status, clientes.nome AS nome, clientes.endereco AS endereco, clientes.cidade AS cidade, clientes.estado AS estado, clientes.telefone AS telefone FROM pedidos INNER JOIN clientes ON clientes.id = pedidos.cliente_id WHERE pedidos.id=(SELECT MAX(pedidos.id) FROM pedidos WHERE cliente_id = ?)';
+  const selectQuery = 'SELECT pedidos.id AS id, pedidos.data_criacao AS dataCriacao, pedidos.data_entrega AS dataEntrega, pedidos.valor_total AS valorTotal, pedidos.status as status, pedidos.observacao as observacao, clientes.nome AS nome, clientes.endereco AS endereco, clientes.cidade AS cidade, clientes.estado AS estado, clientes.telefone AS telefone FROM pedidos INNER JOIN clientes ON clientes.id = pedidos.cliente_id WHERE pedidos.id=(SELECT MAX(pedidos.id) FROM pedidos WHERE cliente_id = ?)';
   try {
     db.execute(selectQuery, [clienteId], (error, results) => {
       if (error) {
@@ -337,21 +363,23 @@ exports.recuperarUltimoPedidoByCliente = async (req, res) => {
 };
 
 exports.recuperarPedidosByCliente = async (req, res) => {
-  const { clienteId } = req.params;
-  const selectQuery = 'SELECT pedidos.id AS id, pedidos.data_criacao AS dataCriacao, pedidos.data_entrega AS dataEntrega, pedidos.valor_total AS valorTotal, pedidos.status as status, clientes.nome AS nome, clientes.endereco AS endereco, clientes.cidade AS cidade, clientes.estado AS estado, clientes.telefone AS telefone FROM pedidos INNER JOIN clientes ON clientes.id = pedidos.cliente_id WHERE pedidos.cliente_id = ?';
-  try {
-    db.execute(selectQuery, [clienteId], (error, results) => {
-      if (error) {
-        res.status(500).send({
-          developMessage: error.message,
-          userMessage: 'Falha ao recuperar os pedidos desse Cliente.',
-        });
-        return false;
-      }
+  setTimeout(() => {
+    const { clienteId } = req.params;
+    const selectQuery = 'SELECT pedidos.id AS id, pedidos.data_criacao AS dataCriacao, pedidos.data_entrega AS dataEntrega, pedidos.valor_total AS valorTotal, pedidos.status as status, pedidos.observacao as observacao, clientes.nome AS nome, clientes.endereco AS endereco, clientes.cidade AS cidade, clientes.estado AS estado, clientes.telefone AS telefone FROM pedidos INNER JOIN clientes ON clientes.id = pedidos.cliente_id WHERE pedidos.cliente_id = ?';
+    try {
+      db.execute(selectQuery, [clienteId], (error, results) => {
+        if (error) {
+          res.status(500).send({
+            developMessage: error.message,
+            userMessage: 'Falha ao recuperar os pedidos desse Cliente.',
+          });
+          return false;
+        }
 
-      res.status(200).send({ pedidos: results });
-    });
-  } catch (error) {
-    res.status(500).send({ message: 'Ocorreu um erro ao recuperar o último pedido desse Cliente.' });
-  }
+        res.status(200).send({ pedidos: results });
+      });
+    } catch (error) {
+      res.status(500).send({ message: 'Ocorreu um erro ao recuperar o último pedido desse Cliente.' });
+    }
+  }, 2000);
 };
