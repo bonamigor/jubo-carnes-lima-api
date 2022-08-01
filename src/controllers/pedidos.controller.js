@@ -363,23 +363,47 @@ exports.recuperarUltimoPedidoByCliente = async (req, res) => {
 };
 
 exports.recuperarPedidosByCliente = async (req, res) => {
-  setTimeout(() => {
-    const { clienteId } = req.params;
-    const selectQuery = 'SELECT pedidos.id AS id, pedidos.data_criacao AS dataCriacao, pedidos.data_entrega AS dataEntrega, pedidos.valor_total AS valorTotal, pedidos.status as status, pedidos.observacao as observacao, clientes.nome AS nome, clientes.endereco AS endereco, clientes.cidade AS cidade, clientes.estado AS estado, clientes.telefone AS telefone FROM pedidos INNER JOIN clientes ON clientes.id = pedidos.cliente_id WHERE pedidos.cliente_id = ?';
-    try {
-      db.execute(selectQuery, [clienteId], (error, results) => {
-        if (error) {
-          res.status(500).send({
-            developMessage: error.message,
-            userMessage: 'Falha ao recuperar os pedidos desse Cliente.',
-          });
-          return false;
-        }
+  const { clienteId } = req.params;
+  const selectQuery = 'SELECT pedidos.id AS id, pedidos.data_criacao AS dataCriacao, pedidos.data_entrega AS dataEntrega, pedidos.valor_total AS valorTotal, pedidos.status as status, pedidos.observacao as observacao, clientes.nome AS nome, clientes.endereco AS endereco, clientes.cidade AS cidade, clientes.estado AS estado, clientes.telefone AS telefone FROM pedidos INNER JOIN clientes ON clientes.id = pedidos.cliente_id WHERE pedidos.cliente_id = ?';
+  try {
+    db.execute(selectQuery, [clienteId], (error, results) => {
+      if (error) {
+        res.status(500).send({
+          developMessage: error.message,
+          userMessage: 'Falha ao recuperar os pedidos desse Cliente.',
+        });
+        return false;
+      }
 
-        res.status(200).send({ pedidos: results });
-      });
-    } catch (error) {
-      res.status(500).send({ message: 'Ocorreu um erro ao recuperar o último pedido desse Cliente.' });
-    }
-  }, 2000);
+      res.status(200).send({ pedidos: results });
+    });
+  } catch (error) {
+    res.status(500).send({ message: 'Ocorreu um erro ao recuperar o último pedido desse Cliente.' });
+  }
+};
+
+exports.ordersByClientReport = async (req, res) => {
+  try {
+    const { dataInicial, dataFinal } = req.body;
+    const selectQuery = `
+      SELECT pedidos.id AS id, clientes.nome AS cliente, pedidos.data_criacao AS dataCriacao, pedidos.data_entrega AS dataEntrega, pedidos.valor_total AS total 
+      FROM pedidos 
+      INNER JOIN clientes ON clientes.id = pedidos.cliente_id
+      WHERE pedidos.data_criacao BETWEEN ? AND ?
+    `;
+
+    db.execute(selectQuery, [dataInicial, dataFinal], (err, results) => {
+      if (err) {
+        res.status(500).send({
+          developMessage: err.message,
+          userMessage: 'Falha ao recuperar os pedidos desse Cliente.',
+        });
+        return false;
+      }
+
+      res.status(200).send({ vendas: results });
+    });
+  } catch (error) {
+    res.status(500).send({ message: 'Ocorreu um erro ao recuperar os pedidos desse Cliente.' });
+  }
 };

@@ -27,6 +27,8 @@ router.put('/pedidos/:pedidoId/observacao', pedidosController.adicionarObservaca
 // ==> POST http://localhost:3000/api/pedidos
 router.post('/pedidos', pedidosController.createPedido);
 
+router.post('/pedidos/relatorio-data', pedidosController.ordersByClientReport);
+
 // ==> DELETE http://localhost:3000/api/pedidos
 router.delete('/pedidos/:pedidoId', pedidosController.deletePedido);
 

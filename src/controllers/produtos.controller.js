@@ -122,3 +122,31 @@ exports.listOneProduto = async (req, res) => {
     res.status(500).send({ message: 'Ocorreu um erro ao listar o produto.' });
   }
 };
+
+exports.listAllProdutosForBuying = async (req, res) => {
+  try {
+    const { dataInicial, dataFinal } = req.body;
+    const selectQuery = `
+      SELECT produtos.nome as nome, produtos.unidade_medida as unidadeMedida, SUM(item_pedido.quantidade) AS quantidade FROM pedidos 
+      INNER JOIN item_pedido ON pedidos.id = item_pedido.pedido_id
+      INNER JOIN produtos ON item_pedido.produto_id = produtos.id
+      WHERE status = 'CONFIRMADO' AND data_entrega BETWEEN ? AND ?
+      GROUP BY produtos.nome, produtos.unidade_medida
+      ORDER BY produtos.nome ASC
+    `;
+
+    db.execute(selectQuery, [dataInicial, dataFinal], (err, results) => {
+      if (err) {
+        res.status(500).send({
+          developMessage: err,
+          userMessage: 'Falha ao listar os produtos nessa data.',
+        });
+        return false;
+      }
+
+      res.status(200).send({ produtos: results });
+    });
+  } catch (error) {
+    res.status(500).send({ message: 'Ocorreu um erro ao listar os produtos nessa data.' });
+  }
+};
