@@ -1,5 +1,6 @@
 /* eslint-disable consistent-return */
 /* eslint-disable no-unused-vars */
+const { format } = require('date-fns');
 const db = require('../config/database');
 
 // ==> Método que cria uma estante
@@ -111,8 +112,16 @@ exports.listAllEstantes = async (req, res) => {
 // ==> Método que retorna a Estante com os Dados do Cliente (Nome);
 exports.listAllEstantesCliente = async (req, res) => {
   try {
-    const selectQuery = 'SELECT estantes.id, periodo, clientes.id as clienteId, clientes.nome as cliente, estantes.observacao as observacao, estantes.ativa FROM estantes INNER JOIN clientes ON estantes.cliente_id = clientes.id where cliente_id = ? and ativa = 1';
-    db.execute(selectQuery, [req.params.id], (err, results) => {
+    const data = new Date();
+    const mes = data.getMonth();
+    let dataFormatada;
+    if (mes <= 6) {
+      dataFormatada = `${format(data, 'yyyy')}/01%`;
+    } else {
+      dataFormatada = `${format(data, 'yyyy')}/02%`;
+    }
+    const selectQuery = 'SELECT estantes.id, periodo, clientes.id as clienteId, clientes.nome as cliente, estantes.observacao as observacao, estantes.ativa FROM estantes INNER JOIN clientes ON estantes.cliente_id = clientes.id where cliente_id = ? and ativa = 1 and periodo like ?';
+    db.execute(selectQuery, [req.params.id, dataFormatada], (err, results) => {
       if (err) {
         res.status(500).send({
           developMessage: err.message,
