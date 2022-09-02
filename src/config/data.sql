@@ -45,7 +45,10 @@ preco_quantidade_id int not null,
 primary key(estante_id, produto_id), 
 foreign key (estante_id) references estantes(id) on delete cascade, 
 foreign key (produto_id) references produtos(id),
-foreign key (preco_quantidade_id) references preco_quantidade(id) on delete cascade);
+foreign key (preco_quantidade_id) references preco_quantidade(id) on delete cascade
+constraint unique_estante_produto unique (estante_id, produto_id);
+);
+
 
 create table users (
   id int not null auto_increment,
@@ -84,6 +87,7 @@ create table item_pedido (
   foreign key (pedido_id) references pedidos(id) ON DELETE CASCADE,
   foreign key (produto_id) references produtos(id),
   foreign key (estante_id) references estantes(id)
+  constraint unique_produto_id unique (produto_id);
 );
 
 SELECT estante_id, produtos.nome, produtos.preco_custo, produtos.unidade_medida, preco_quantidade.preco_venda, preco_quantidade.quantidade
