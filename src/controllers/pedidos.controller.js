@@ -200,16 +200,18 @@ exports.deletePedido = async (req, res) => {
 exports.listAllPedidos = async (req, res) => {
   const selectQuery = 'SELECT pedidos.id AS id, pedidos.data_criacao AS dataCriacao, pedidos.valor_total AS valorTotal, pedidos.status as status, pedidos.observacao as observacao, clientes.nome AS nome, clientes.endereco AS endereco, clientes.cidade AS cidade, clientes.estado AS estado, clientes.telefone AS telefone FROM pedidos INNER JOIN clientes ON clientes.id = pedidos.cliente_id WHERE pedidos.status = "CRIADO"';
   try {
-    db.execute(selectQuery, (err, results) => {
-      if (err) {
-        res.status(500).send({
-          developMessage: err.message,
-          userMessage: 'Falha ao listar os pedidos.',
-        });
-        return false;
-      }
-      res.status(200).send({ pedidos: results });
-    });
+    setTimeout(() => {
+      db.execute(selectQuery, (err, results) => {
+        if (err) {
+          res.status(500).send({
+            developMessage: err.message,
+            userMessage: 'Falha ao listar os pedidos.',
+          });
+          return false;
+        }
+        res.status(200).send({ pedidos: results });
+      });
+    }, 1500)
   } catch (error) {
     console.error('listAllPedidos', error);
     res.status(500).send({ message: 'Ocorreu um erro ao listar os pedidos.' });
@@ -221,16 +223,18 @@ exports.listAllTomorrowPedidos = async (req, res) => {
   const dataEntrega = new Date().setDate(new Date() + 1);
   const selectQuery = 'SELECT pedidos.id AS id, pedidos.data_criacao AS dataCriacao, pedidos.valor_total AS valorTotal, clientes.nome AS nome, clientes.cidade AS cidade, clientes.estado AS estado FROM pedidos INNER JOIN clientes ON clientes.id = pedidos.cliente_id where pedidos.data_entrega = ?';
   try {
-    db.execute(selectQuery, [dataEntrega], (err, results) => {
-      if (err) {
-        res.status(500).send({
-          developMessage: err.message,
-          userMessage: 'Falha ao listar os pedidos.',
-        });
-        return false;
-      }
-      res.status(200).send({ pedidos: results });
-    });
+    setTimeout(() => {
+      db.execute(selectQuery, [dataEntrega], (err, results) => {
+        if (err) {
+          res.status(500).send({
+            developMessage: err.message,
+            userMessage: 'Falha ao listar os pedidos.',
+          });
+          return false;
+        }
+        res.status(200).send({ pedidos: results });
+      });
+    }, 5000)
   } catch (error) {
     console.error('listAllTomorrowPedidos', error);
     res.status(500).send({ message: 'Ocorreu um erro ao listar os pedidos.' });
@@ -407,3 +411,31 @@ exports.ordersByClientReport = async (req, res) => {
     res.status(500).send({ message: 'Ocorreu um erro ao recuperar os pedidos desse Cliente.' });
   }
 };
+
+exports.ordersBetweenDates = async (req, res) => {
+  const { dataInicial, dataFinal } = req.params;
+  const selectQuery = `SELECT pedidos.id AS id, clientes.nome AS cliente, pedidos.data_criacao AS dataCriacao, pedidos.status AS status, pedidos.data_entrega AS dataEntrega, pedidos.valor_total AS total 
+  FROM pedidos 
+  INNER JOIN clientes ON clientes.id = pedidos.cliente_id
+  where pedidos.data_criacao BETWEEN ? AND ?;`;
+
+  try {
+    db.execute(selectQuery, [dataInicial, dataFinal], (err, results) => {
+      if (err) {
+        res.status(500).send({
+          developMessage: err.message,
+          userMessage: `Falha ao recuperar os pedidos entre essas datas. (${dataInicial} a ${dataFinal}).`,
+        });
+        return false;
+      }
+
+      const total = results.reduce((acumulador, numero) => {
+        return acumulador += numero.total
+      }, 0)
+
+      res.status(200).send({ pedidos: results, valorTotal: total });
+    })
+  } catch (error) {
+    res.status(500).send({ message: `Ocorreu um erro ao recuperar os pedidos entre essas datas. (${dataInicial} a ${dataFinal})` });
+  }
+}
