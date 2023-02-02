@@ -1,66 +1,54 @@
 const db = require('../config/database');
 
 exports.adicionarItemAoPedido = async (req, res) => {
-  const { estanteId, produtoId, quantidade } = req.body;
+  const { estanteId, produtoId, precoVenda, quantidade } = req.body;
   const { pedidoId } = req.params;
   const numberPedidoId = Number(pedidoId);
-  // Essa Query recupera o Preço de Venda do Produto para poder calcular o preço total.
-  const selectQuery = 'SELECT preco_venda FROM estante_produto INNER JOIN preco_quantidade ON estante_produto.preco_quantidade_id = preco_quantidade.id WHERE estante_produto.estante_id = ? AND estante_produto.produto_id = ?';
   const insertQuery = 'INSERT INTO item_pedido (pedido_id, produto_id, estante_id, quantidade, preco_total) VALUES (?, ?, ?, ?, ?)';
-  db.execute(selectQuery, [estanteId, produtoId], (err, results) => {
-    if (err) {
-      console.error(err);
-    }
-    const precoTotal = results[0].preco_venda * quantidade;
-    db.execute(insertQuery,
-      [numberPedidoId, produtoId, estanteId, quantidade, precoTotal],
-      (error, result) => {
-        if (error || result.affectedRows === 0) {
-          res.status(500).send({
-            developMessage: error.message,
-            userMessage: 'Falha ao inserir o Item ao pedido.',
-          });
-          return false;
-        }
-        res.status(201).send({
-          message: 'Item adicionado ao Pedido com sucesso!',
-          affectedRows: result.affectedRows,
+
+  const precoTotal = precoVenda * quantidade;
+  db.execute(insertQuery,
+    [numberPedidoId, produtoId, estanteId, quantidade, precoTotal],
+    (error, result) => {
+      if (error || result.affectedRows === 0) {
+        res.status(500).send({
+          developMessage: error.message,
+          userMessage: 'Falha ao inserir o Item ao pedido.',
         });
-        this.calculaValorTotal(req, res);
-        this.atualizaQuantidadeAoInserir(req, res);
+        return false;
+      }
+      res.status(201).send({
+        message: 'Item adicionado ao Pedido com sucesso!',
+        affectedRows: result.affectedRows,
       });
-  });
+      this.calculaValorTotal(req, res);
+      this.atualizaQuantidadeAoInserir(req, res);
+    });
 };
 
 exports.atualizaItemNoPedido = async (req, res) => {
-  const { estanteId, produtoId, quantidade } = req.body;
+  const { estanteId, produtoId, precoVenda, quantidade } = req.body;
   const { pedidoId, itemPedidoId } = req.params;
-  // Essa Query recupera o Preço de Venda do Produto para poder calcular o preço total.
-  const selectQuery = 'SELECT preco_venda FROM estante_produto INNER JOIN preco_quantidade ON estante_produto.preco_quantidade_id = preco_quantidade.id WHERE estante_produto.estante_id = ? AND estante_produto.produto_id = ?';
   const updateQuery = 'UPDATE item_pedido SET pedido_id = ?, produto_id = ?, quantidade = ?, preco_total = ? WHERE id = ?';
-  db.execute(selectQuery, [estanteId, produtoId], (err, results) => {
-    if (err) {
-      console.error(err);
-    }
-    const precoTotal = results[0].preco_venda * quantidade;
-    db.execute(updateQuery,
-      [pedidoId, produtoId, quantidade, precoTotal, itemPedidoId],
-      (error, result) => {
-        if (error || result.affectedRows === 0) {
-          res.status(500).send({
-            developMessage: error.sqlMessage,
-            userMessage: 'Falha ao atualizar o Item do pedido.',
-          });
-          return false;
-        }
-        res.status(201).send({
-          message: 'Item atualizado no Pedido com sucesso!',
-          affectedRows: result.affectedRows,
+
+  const precoTotal = precoVenda * quantidade;
+  db.execute(updateQuery,
+    [pedidoId, produtoId, quantidade, precoTotal, itemPedidoId],
+    (error, result) => {
+      if (error || result.affectedRows === 0) {
+        res.status(500).send({
+          developMessage: error.sqlMessage,
+          userMessage: 'Falha ao atualizar o Item do pedido.',
         });
-        this.calculaValorTotal(req, res);
-        this.atualizaQuantidadeAoAtualizar(req, res);
+        return false;
+      }
+      res.status(201).send({
+        message: 'Item atualizado no Pedido com sucesso!',
+        affectedRows: result.affectedRows,
       });
-  });
+      this.calculaValorTotal(req, res);
+      this.atualizaQuantidadeAoAtualizar(req, res);
+    });
 };
 
 exports.calculaValorTotal = async (req, res) => {
@@ -112,7 +100,7 @@ exports.atualizaQuantidadeAoAtualizar = async (req, res) => {
 
 exports.deletarItemPedido = async (req, res) => {
   try {
-    const { itemPedidoId } = req.params;
+    const { pedidoId, itemPedidoId } = req.params;
     const deleteQuery = 'DELETE FROM item_pedido where item_pedido.id = ?';
 
     db.execute(deleteQuery, [itemPedidoId], (error, results) => {
@@ -128,6 +116,7 @@ exports.deletarItemPedido = async (req, res) => {
         affectedRows: results.affectedRows,
       });
     });
+    this.calculaValorTotal(req, res);
   } catch (error) {
     res.status(500).send({
       message: 'Ocorreu um erro ao Excluir o Item do Pedido.',

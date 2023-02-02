@@ -17,15 +17,27 @@ exports.createProduto = async (req, res) => {
         });
         return false;
       }
-      res.status(201).send({
-        message: 'Produto criado com sucesso!',
-        produto: {
-          nome,
-          precoCusto,
-          unidadeMedida,
-          affectedRows: results.affectedRows,
-        },
-      });
+      db.execute('SELECT LAST_INSERT_ID();', (error, result) => {
+        if (err) {
+          res.status(500).send({
+            developMessage: error.message,
+            userMessage: 'Falha ao recuperar ID do produto criado.',
+          });
+          return false;
+        }
+
+        res.status(201).send({
+          message: 'Produto criado com sucesso!',
+          produto: {
+            id: Object.values(result[0])[0],
+            nome,
+            precoCusto,
+            unidadeMedida,
+            affectedRows: results.affectedRows,
+          },
+        });
+      })
+      
     });
   } catch (error) {
     console.error('createProduto', error);
