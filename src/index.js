@@ -14,7 +14,7 @@ const exclusions = ['/api/autenticacao'];
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 app.use(express.json({ type: 'application/vnd.api+json' }));
-app.use(cors());
+app.use(cors({ origin: 'https://www.jubo-solucoes.com.br' }));
 app.use(jwtMiddleware({ exclusions }));
 
 app.use('/api/', index);
