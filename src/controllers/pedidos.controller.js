@@ -245,7 +245,7 @@ exports.listAllTomorrowPedidos = async (req, res) => {
 exports.listOnePedido = async (req, res) => {
   const { pedidoId } = req.params;
   try {
-    db.execute('SELECT * FROM pedidos WHERE id = ?', [pedidoId], (err, results) => {
+    db.execute('SELECT pedidos.id AS id, pedidos.data_criacao AS dataCriacao, pedidos.data_entrega AS dataEntrega, pedidos.valor_total AS valorTotal, pedidos.status as status, pedidos.observacao as observacao, clientes.nome AS nome, clientes.endereco AS endereco, clientes.cidade AS cidade, clientes.estado AS estado, clientes.telefone AS telefone FROM pedidos INNER JOIN clientes ON clientes.id = pedidos.cliente_id WHERE pedidos.id = ?', [pedidoId], (err, results) => {
       if (err) {
         res.status(500).send({
           developMessage: err.message,
