@@ -5,7 +5,7 @@ const db = require('../config/database');
 // ==> Método que adicionará um pedido ao banco de dados
 exports.createPedido = async (req, res) => {
   const { clienteId } = req.body;
-  const dataCriacao = new Date();
+  const dataCriacao = new Date().getTime();
   try {
     const insertQuery = 'INSERT INTO pedidos (data_criacao, status, cliente_id) VALUES (?, ?, ?)';
     db.execute(insertQuery, [dataCriacao, 'CRIADO', clienteId],
