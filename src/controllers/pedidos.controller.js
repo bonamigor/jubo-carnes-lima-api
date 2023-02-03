@@ -37,7 +37,7 @@ exports.createPedido = async (req, res) => {
 exports.confirmaPedido = async (req, res) => {
   const { dataEntrega } = req.body;
   const { pedidoId } = req.params;
-  const dataConfirmacao = new Date();
+  const dataConfirmacao = new Date().getTime();
   const status = 'CONFIRMADO';
   try {
     const updateQuery = 'UPDATE pedidos SET data_confirmacao = ?, data_entrega = ?, status = ? WHERE id = ?';
@@ -68,7 +68,7 @@ exports.confirmaPedido = async (req, res) => {
 // ==> Método que atualizará a data de entrega e o status
 exports.entregaPedido = async (req, res) => {
   const { pedidoId } = req.params;
-  const dataEntrega = new Date();
+  const dataEntrega = new Date().getTime();
   const status = 'ENTREGUE';
   try {
     const updateQuery = 'UPDATE pedidos SET data_entrega = ?, status = ? WHERE id = ?';
@@ -126,7 +126,7 @@ exports.adicionarObservacao = async (req, res) => {
 // ==> Método que adicionará uma data de cancelamento e o status para CANCELADO
 exports.cancelaPedido = async (req, res) => {
   const { pedidoId } = req.params;
-  const dataCancelamento = new Date();
+  const dataCancelamento = new Date().getTime();
   const statusPedido = 'CANCELADO';
   const updateQuery = 'UPDATE pedidos SET data_cancelamento = ?, status = ? WHERE id = ?';
   try {
