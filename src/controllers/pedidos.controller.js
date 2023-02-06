@@ -1,5 +1,6 @@
 /* eslint-disable consistent-return */
 /* eslint-disable no-unused-vars */
+const { format } = require('date-fns');
 const db = require('../config/database');
 
 // ==> Método que adicionará um pedido ao banco de dados
@@ -265,7 +266,7 @@ exports.listOnePedido = async (req, res) => {
 exports.listAllPedidosByCliente = async (req, res) => {
   const { clienteId } = req.body;
   try {
-    db.execute('SELECT * FROM pedidos where clienteId = ?', [clienteId], (err, results) => {
+    db.execute('SELECT * FROM pedidos WHERE cliente_id = ?', [clienteId], (err, results) => {
       if (err) {
         res.status(500).send({
           developMessage: err.message,
@@ -368,7 +369,7 @@ exports.recuperarUltimoPedidoByCliente = async (req, res) => {
 
 exports.recuperarPedidosByCliente = async (req, res) => {
   const { clienteId } = req.params;
-  const selectQuery = 'SELECT pedidos.id AS id, pedidos.data_criacao AS dataCriacao, pedidos.data_entrega AS dataEntrega, pedidos.valor_total AS valorTotal, pedidos.status as status, pedidos.observacao as observacao, clientes.nome AS nome, clientes.endereco AS endereco, clientes.cidade AS cidade, clientes.estado AS estado, clientes.telefone AS telefone FROM pedidos INNER JOIN clientes ON clientes.id = pedidos.cliente_id WHERE pedidos.cliente_id = ? AND valor_total > 0';
+  const selectQuery = 'SELECT pedidos.id AS id, pedidos.data_criacao AS dataCriacao, pedidos.data_entrega AS dataEntrega, pedidos.valor_total AS valorTotal, pedidos.status as status, pedidos.observacao as observacao, clientes.nome AS nome, clientes.endereco AS endereco, clientes.cidade AS cidade, clientes.estado AS estado, clientes.telefone AS telefone FROM pedidos INNER JOIN clientes ON clientes.id = pedidos.cliente_id WHERE pedidos.cliente_id = ?';
   try {
     db.execute(selectQuery, [clienteId], (error, results) => {
       if (error) {
@@ -437,5 +438,26 @@ exports.ordersBetweenDates = async (req, res) => {
     })
   } catch (error) {
     res.status(500).send({ message: `Ocorreu um erro ao recuperar os pedidos entre essas datas. (${dataInicial} a ${dataFinal})` });
+  }
+}
+
+exports.atualizarDataEntrega = async (req, res) => {
+  const { pedidoId, dataEntrega } = req.params;
+  const patchQuery = "UPDATE pedidos SET data_entrega = ? WHERE id = ?"
+
+  try {
+    db.execute(patchQuery, [Number(dataEntrega), pedidoId], (err, result) => {
+      if (err) {
+        res.status(500).send({
+          developMessage: err.message,
+          userMessage: `Falha ao alterar a data de entrega para este pedido.`,
+        });
+        return false;
+      }
+
+      res.status(200).send({ pedidoId: pedidoId, dataEntrega: format(new Date(Number(dataEntrega)), 'dd/MM/yyyy'), affectedRows: result.affectedRows });
+    })
+  } catch (error) {
+    res.status(500).send({ message: `Ocorreu um erro ao atualizar a data de entrega para este pedido.` });
   }
 }

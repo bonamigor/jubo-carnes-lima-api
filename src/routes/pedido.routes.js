@@ -24,6 +24,8 @@ router.put('/pedidos/:pedidoId/entregar', pedidosController.entregaPedido);
 // ==> PUT http://localhost:3000/api/pedidos/pedidoId/observacao
 router.put('/pedidos/:pedidoId/observacao', pedidosController.adicionarObservacao);
 
+router.patch('/pedidos/:pedidoId/alterar/entrega/:dataEntrega', pedidosController.atualizarDataEntrega)
+
 // ==> POST http://localhost:3000/api/pedidos
 router.post('/pedidos', pedidosController.createPedido);
 
