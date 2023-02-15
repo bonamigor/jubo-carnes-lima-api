@@ -461,3 +461,28 @@ exports.atualizarDataEntrega = async (req, res) => {
     res.status(500).send({ message: `Ocorreu um erro ao atualizar a data de entrega para este pedido.` });
   }
 }
+
+exports.atualizarValorTotal = async (req, res) => {
+  const { pedidoId } = req.params;
+  const { valorTotal } = req.body;
+
+  console.log(req.params)
+  console.log(req.body)
+  const patchQuery = "UPDATE pedidos SET valor_total = ? WHERE id = ?"
+
+  try {
+    db.execute(patchQuery, [Number(valorTotal), pedidoId], (err, result) => {
+      if (err) {
+        res.status(500).send({
+          developMessage: err.message,
+          userMessage: `Falha ao atualizar o valor total deste pedido.`,
+        });
+        return false;
+      }
+
+      res.status(200).send({ message: 'Pedido fechado com o valor atualizado!', pedidoId: pedidoId, valorTotal: valorTotal, affectedRows: result.affectedRows });
+    })
+  } catch (error) {
+    res.status(500).send({ message: `Ocorreu um erro ao atualizar o valor total deste pedido.` });
+  }
+}
