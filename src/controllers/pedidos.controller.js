@@ -418,7 +418,7 @@ exports.ordersBetweenDates = async (req, res) => {
   const selectQuery = `SELECT pedidos.id AS id, clientes.nome AS cliente, pedidos.data_criacao AS dataCriacao, pedidos.status AS status, pedidos.data_entrega AS dataEntrega, pedidos.valor_total AS total 
   FROM pedidos 
   INNER JOIN clientes ON clientes.id = pedidos.cliente_id
-  where pedidos.data_criacao BETWEEN ? AND ?;`;
+  where pedidos.data_entrega BETWEEN ? AND ?;`;
 
   try {
     db.execute(selectQuery, [dataInicial, dataFinal], (err, results) => {
@@ -466,8 +466,6 @@ exports.atualizarValorTotal = async (req, res) => {
   const { pedidoId } = req.params;
   const { valorTotal } = req.body;
 
-  console.log(req.params)
-  console.log(req.body)
   const patchQuery = "UPDATE pedidos SET valor_total = ? WHERE id = ?"
 
   try {
