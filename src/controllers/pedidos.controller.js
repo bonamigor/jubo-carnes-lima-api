@@ -466,10 +466,10 @@ exports.atualizarValorTotal = async (req, res) => {
   const { pedidoId } = req.params;
   const { valorTotal } = req.body;
 
-  const patchQuery = "UPDATE pedidos SET valor_total = ? WHERE id = ?"
+  const putQuery = "UPDATE pedidos SET valor_total = ? WHERE id = ?"
 
   try {
-    db.execute(patchQuery, [Number(valorTotal), pedidoId], (err, result) => {
+    db.execute(putQuery, [Number(valorTotal), pedidoId], (err, result) => {
       if (err) {
         res.status(500).send({
           developMessage: err.message,
@@ -482,5 +482,27 @@ exports.atualizarValorTotal = async (req, res) => {
     })
   } catch (error) {
     res.status(500).send({ message: `Ocorreu um erro ao atualizar o valor total deste pedido.` });
+  }
+}
+
+exports.setarPedidoComoEntregue = async (req, res) => {
+  const { pedidoId } = req.params;
+
+  const patchQuery = "UPDATE pedidos SET entregue = 1, status = 'ENTREGUE' WHERE id = ?;";
+
+  try {
+    db.execute(patchQuery, [pedidoId], (err, result) => {
+      if (err) {
+        res.status(500).send({
+          developMessage: err.message,
+          userMessage: `Falha ao atualizar pedido para status de Entregue.`,
+        });
+        return false;
+      }
+
+      res.status(200).send({ message: 'Pedido entregue com sucesso!', pedidoId: pedidoId, affectedRows: result.affectedRows });
+    })
+  } catch (error) {
+    res.status(500).send({ message: `Ocorreu um erro ao atualizar pedido para status de Entregue.` });
   }
 }

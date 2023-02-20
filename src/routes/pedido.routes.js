@@ -26,6 +26,8 @@ router.put('/pedidos/:pedidoId/observacao', pedidosController.adicionarObservaca
 
 router.patch('/pedidos/:pedidoId/alterar/entrega/:dataEntrega', pedidosController.atualizarDataEntrega)
 
+router.patch('/pedidos/:pedidoId/entrega', pedidosController.setarPedidoComoEntregue)
+
 router.put('/pedidos/:pedidoId/atualizar/valorTotal', pedidosController.atualizarValorTotal)
 
 // ==> POST http://localhost:3000/api/pedidos
