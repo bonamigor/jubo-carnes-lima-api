@@ -418,7 +418,8 @@ exports.ordersBetweenDates = async (req, res) => {
   const selectQuery = `SELECT pedidos.id AS id, clientes.nome AS cliente, pedidos.data_criacao AS dataCriacao, pedidos.status AS status, pedidos.data_entrega AS dataEntrega, pedidos.valor_total AS total 
   FROM pedidos 
   INNER JOIN clientes ON clientes.id = pedidos.cliente_id
-  where pedidos.data_entrega BETWEEN ? AND ?;`;
+  WHERE pedidos.data_entrega BETWEEN ? AND ?
+  AND pedidos.status = "CONFIRMADO" OR pedidos.status = "ENTREGUE";`;
 
   try {
     db.execute(selectQuery, [dataInicial, dataFinal], (err, results) => {
@@ -466,10 +467,11 @@ exports.atualizarValorTotal = async (req, res) => {
   const { pedidoId } = req.params;
   const { valorTotal } = req.body;
 
-  const putQuery = "UPDATE pedidos SET valor_total = ? WHERE id = ?"
+  const putQuery = valorTotal ? "UPDATE pedidos SET valor_total = ? WHERE id = ?" : "update pedidos set pedidos.valor_total = (select sum(item_pedido.preco_total) as total from item_pedido where item_pedido.pedido_id = ?) where id = ?"
+  const paramsArray = valorTotal ? [Number(valorTotal), pedidoId] : [pedidoId, pedidoId]
 
   try {
-    db.execute(putQuery, [Number(valorTotal), pedidoId], (err, result) => {
+    db.execute(putQuery, paramsArray, (err, result) => {
       if (err) {
         res.status(500).send({
           developMessage: err.message,
