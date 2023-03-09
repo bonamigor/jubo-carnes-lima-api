@@ -509,3 +509,25 @@ exports.setarPedidoComoEntregue = async (req, res) => {
     res.status(500).send({ message: `Ocorreu um erro ao atualizar pedido para status de Entregue.` });
   }
 }
+
+exports.setarEmpresaAoPedido = async (req, res) => {
+  const { pedidoId, idEmpresa } = req.params;
+
+  const patchQuery = "UPDATE pedidos SET empresa = ? WHERE pedidos.id = ?;";
+
+  try {
+    db.execute(patchQuery, [idEmpresa, pedidoId], (err, result) => {
+      if (err) {
+        res.status(500).send({
+          developMessage: err.message,
+          userMessage: `Falha ao setar empresa ao pedido.`,
+        });
+        return false;
+      }
+
+      res.status(200).send({ message: 'Empresa cadastrada ao pedido com sucesso!', pedidoId: pedidoId, affectedRows: result.affectedRows });
+    })
+  } catch (error) {
+    res.status(500).send({ message: `Ocorreu um erro ao atualizar empresa do pedido.` });
+  }
+}

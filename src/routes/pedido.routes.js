@@ -28,6 +28,8 @@ router.patch('/pedidos/:pedidoId/alterar/entrega/:dataEntrega', pedidosControlle
 
 router.patch('/pedidos/:pedidoId/entrega', pedidosController.setarPedidoComoEntregue)
 
+router.patch('/pedidos/:pedidoId/empresa/:idEmpresa', pedidosController.setarEmpresaAoPedido)
+
 router.put('/pedidos/:pedidoId/atualizar/valorTotal', pedidosController.atualizarValorTotal)
 
 // ==> POST http://localhost:3000/api/pedidos
