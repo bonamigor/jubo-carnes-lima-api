@@ -201,18 +201,16 @@ exports.deletePedido = async (req, res) => {
 exports.listAllPedidos = async (req, res) => {
   const selectQuery = 'SELECT pedidos.id AS id, pedidos.data_criacao AS dataCriacao, pedidos.valor_total AS valorTotal, pedidos.status as status, pedidos.observacao as observacao, clientes.nome AS nome, clientes.endereco AS endereco, clientes.cidade AS cidade, clientes.estado AS estado, clientes.telefone AS telefone FROM pedidos INNER JOIN clientes ON clientes.id = pedidos.cliente_id WHERE pedidos.status = "CRIADO"';
   try {
-    setTimeout(() => {
-      db.execute(selectQuery, (err, results) => {
-        if (err) {
-          res.status(500).send({
-            developMessage: err.message,
-            userMessage: 'Falha ao listar os pedidos.',
-          });
-          return false;
-        }
-        res.status(200).send({ pedidos: results });
-      });
-    }, 1500)
+    db.execute(selectQuery, (err, results) => {
+      if (err) {
+        res.status(500).send({
+          developMessage: err.message,
+          userMessage: 'Falha ao listar os pedidos.',
+        });
+        return false;
+      }
+      res.status(200).send({ pedidos: results });
+    });
   } catch (error) {
     console.error('listAllPedidos', error);
     res.status(500).send({ message: 'Ocorreu um erro ao listar os pedidos.' });
