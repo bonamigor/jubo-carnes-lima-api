@@ -15,6 +15,9 @@ router.get('/pedidos/:pedidoId', pedidosController.listOnePedido);
 // ==> PUT http://localhost:3000/api/pedidos/pedidoId/cancelar
 router.put('/pedidos/:pedidoId/cancelar', pedidosController.cancelaPedido);
 
+// ==> PUT http://localhost:3000/api/pedidos/pedidoId/cancelar
+router.put('/pedidos/:pedidoId/cancelar-com-observacao', pedidosController.cancelaPedidComObservacao);
+
 // ==> PUT http://localhost:3000/api/pedidos/pedidoId/confirmar
 router.put('/pedidos/:pedidoId/confirmar', pedidosController.confirmaPedido);
 

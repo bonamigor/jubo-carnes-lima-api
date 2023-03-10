@@ -174,6 +174,56 @@ exports.cancelaPedido = async (req, res) => {
   }
 };
 
+exports.cancelaPedidComObservacao = async (req, res) => {
+  const { observacao } = req.body
+  const { pedidoId } = req.params;
+  const dataCancelamento = new Date().getTime();
+  const statusPedido = 'CANCELADO';
+  const updateQuery = 'UPDATE pedidos SET data_cancelamento = ?, observacao_cancelamento = ?, status = ? WHERE id = ?';
+  try {
+    const selectPedido = 'SELECT * FROM pedidos WHERE id = ?';
+    db.execute(selectPedido, [pedidoId], (err, results) => {
+      if (err) {
+        res.status(500).send({
+          developMessage: err.message,
+          userMessage: 'Falha ao recuperar o Pedido.',
+        });
+        return false;
+      }
+
+      const { status } = results[0];
+      if (status === 'ENTREGUE' || status === 'CANCELADO') {
+        res.status(500).send({
+          userMessage: 'Não é possível cancelar um pedido que já foi entregue ou cancelado.',
+        });
+        return false;
+      }
+
+      db.execute(updateQuery,
+        [dataCancelamento, observacao, statusPedido, pedidoId],
+        (erro, result) => {
+          if (erro) {
+            res.status(500).send({
+              developMessage: erro.sqlMessage,
+              userMessage: 'Falha ao alterar o status do Pedido para CANCELADO.',
+            });
+            return false;
+          }
+          res.status(200).send({
+            message: 'Pedido cancelado com sucesso!',
+            pedido: {
+              pedidoId, dataCancelamento, statusPedido,
+            },
+            affectedRows: result.affectedRows,
+          });
+        });
+    });
+  } catch (error) {
+    console.error('cancelaPedido', error);
+    res.status(500).send({ message: 'Ocorreu um erro ao cancelar o Pedido.' });
+  }
+};
+
 // ==> Método que deletará os itens do Pedido além do Pedido em si.
 exports.deletePedido = async (req, res) => {
   const { pedidoId } = req.params;
