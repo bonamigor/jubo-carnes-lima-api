@@ -179,7 +179,7 @@ exports.cancelaPedidComObservacao = async (req, res) => {
   const { pedidoId } = req.params;
   const dataCancelamento = new Date().getTime();
   const statusPedido = 'CANCELADO';
-  const updateQuery = 'UPDATE pedidos SET data_cancelamento = ?, observacao_cancelamento = ?, status = ? WHERE id = ?';
+  const updateQuery = 'UPDATE pedidos SET data_cancelamento = ?, obsCancelamento = ?, status = ? WHERE id = ?';
   try {
     const selectPedido = 'SELECT * FROM pedidos WHERE id = ?';
     db.execute(selectPedido, [pedidoId], (err, results) => {
@@ -249,7 +249,7 @@ exports.deletePedido = async (req, res) => {
 
 // ==> Método que listará todos os pedidos
 exports.listAllPedidos = async (req, res) => {
-  const selectQuery = 'SELECT pedidos.id AS id, pedidos.data_criacao AS dataCriacao, pedidos.valor_total AS valorTotal, pedidos.status as status, pedidos.observacao as observacao, clientes.nome AS nome, clientes.endereco AS endereco, clientes.cidade AS cidade, clientes.estado AS estado, clientes.telefone AS telefone FROM pedidos INNER JOIN clientes ON clientes.id = pedidos.cliente_id WHERE pedidos.status = "CRIADO"';
+  const selectQuery = 'SELECT pedidos.id AS id, pedidos.data_criacao AS dataCriacao, pedidos.valor_total AS valorTotal, pedidos.status as status, pedidos.observacao as observacao, pedidos.obsCancelamento as obsCancelamento, clientes.nome AS nome, clientes.endereco AS endereco, clientes.cidade AS cidade, clientes.estado AS estado, clientes.telefone AS telefone FROM pedidos INNER JOIN clientes ON clientes.id = pedidos.cliente_id WHERE pedidos.status = "CRIADO"';
   try {
     db.execute(selectQuery, (err, results) => {
       if (err) {
@@ -294,7 +294,7 @@ exports.listAllTomorrowPedidos = async (req, res) => {
 exports.listOnePedido = async (req, res) => {
   const { pedidoId } = req.params;
   try {
-    db.execute('SELECT pedidos.id AS id, pedidos.data_criacao AS dataCriacao, pedidos.data_entrega AS dataEntrega, pedidos.valor_total AS valorTotal, pedidos.status as status, pedidos.observacao as observacao, clientes.nome AS nome, clientes.endereco AS endereco, clientes.cidade AS cidade, clientes.estado AS estado, clientes.telefone AS telefone FROM pedidos INNER JOIN clientes ON clientes.id = pedidos.cliente_id WHERE pedidos.id = ?', [pedidoId], (err, results) => {
+    db.execute('SELECT pedidos.id AS id, pedidos.data_criacao AS dataCriacao, pedidos.data_entrega AS dataEntrega, pedidos.valor_total AS valorTotal, pedidos.status as status, pedidos.observacao as observacao, pedidos.obsCancelamento as obsCancelamento, clientes.nome AS nome, clientes.endereco AS endereco, clientes.cidade AS cidade, clientes.estado AS estado, clientes.telefone AS telefone FROM pedidos INNER JOIN clientes ON clientes.id = pedidos.cliente_id WHERE pedidos.id = ?', [pedidoId], (err, results) => {
       if (err) {
         res.status(500).send({
           developMessage: err.message,
@@ -397,7 +397,7 @@ exports.recuperarProdutosNoPedido = async (req, res) => {
 
 exports.recuperarUltimoPedidoByCliente = async (req, res) => {
   const { clienteId } = req.params;
-  const selectQuery = 'SELECT pedidos.id AS id, pedidos.data_criacao AS dataCriacao, pedidos.data_entrega AS dataEntrega, pedidos.valor_total AS valorTotal, pedidos.status as status, pedidos.observacao as observacao, clientes.nome AS nome, clientes.endereco AS endereco, clientes.cidade AS cidade, clientes.estado AS estado, clientes.telefone AS telefone FROM pedidos INNER JOIN clientes ON clientes.id = pedidos.cliente_id WHERE pedidos.id=(SELECT MAX(pedidos.id) FROM pedidos WHERE cliente_id = ?)';
+  const selectQuery = 'SELECT pedidos.id AS id, pedidos.data_criacao AS dataCriacao, pedidos.data_entrega AS dataEntrega, pedidos.valor_total AS valorTotal, pedidos.status as status, pedidos.observacao as observacao, pedidos.obsCancelamento as obsCancelamento, clientes.nome AS nome, clientes.endereco AS endereco, clientes.cidade AS cidade, clientes.estado AS estado, clientes.telefone AS telefone FROM pedidos INNER JOIN clientes ON clientes.id = pedidos.cliente_id WHERE pedidos.id=(SELECT MAX(pedidos.id) FROM pedidos WHERE cliente_id = ?)';
   try {
     db.execute(selectQuery, [clienteId], (error, results) => {
       if (error) {
@@ -417,7 +417,7 @@ exports.recuperarUltimoPedidoByCliente = async (req, res) => {
 
 exports.recuperarPedidosByCliente = async (req, res) => {
   const { clienteId } = req.params;
-  const selectQuery = 'SELECT pedidos.id AS id, pedidos.data_criacao AS dataCriacao, pedidos.data_entrega AS dataEntrega, pedidos.valor_total AS valorTotal, pedidos.status as status, pedidos.observacao as observacao, clientes.nome AS nome, clientes.endereco AS endereco, clientes.cidade AS cidade, clientes.estado AS estado, clientes.telefone AS telefone FROM pedidos INNER JOIN clientes ON clientes.id = pedidos.cliente_id WHERE pedidos.cliente_id = ?';
+  const selectQuery = 'SELECT pedidos.id AS id, pedidos.data_criacao AS dataCriacao, pedidos.data_entrega AS dataEntrega, pedidos.valor_total AS valorTotal, pedidos.status as status, pedidos.observacao as observacao, pedidos.obsCancelamento as obsCancelamento, clientes.nome AS nome, clientes.endereco AS endereco, clientes.cidade AS cidade, clientes.estado AS estado, clientes.telefone AS telefone FROM pedidos INNER JOIN clientes ON clientes.id = pedidos.cliente_id WHERE pedidos.cliente_id = ?';
   try {
     db.execute(selectQuery, [clienteId], (error, results) => {
       if (error) {
