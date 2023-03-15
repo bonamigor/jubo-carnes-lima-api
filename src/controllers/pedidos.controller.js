@@ -438,7 +438,6 @@ exports.recuperarPedidosByCliente = async (req, res) => {
 exports.ordersByClientReport = async (req, res) => {
   try {
     const { clienteId, dataInicial, dataFinal } = req.body;
-    console.log(req.body)
     const selectQuery = `
       SELECT pedidos.id AS id, clientes.nome AS cliente, pedidos.data_criacao AS dataCriacao, pedidos.data_entrega AS dataEntrega, pedidos.valor_total AS total, pedidos.status as status
       FROM pedidos 
@@ -468,11 +467,13 @@ exports.ordersByClientReport = async (req, res) => {
 
 exports.ordersBetweenDates = async (req, res) => {
   const { dataInicial, dataFinal } = req.params;
+  console.log(req.params)
   const selectQuery = `SELECT pedidos.id AS id, clientes.nome AS cliente, pedidos.data_criacao AS dataCriacao, pedidos.status AS status, pedidos.data_entrega AS dataEntrega, pedidos.valor_total AS total 
   FROM pedidos 
   INNER JOIN clientes ON clientes.id = pedidos.cliente_id
   WHERE pedidos.data_entrega BETWEEN ? AND ?
-  AND pedidos.status = "CONFIRMADO" OR pedidos.status = "ENTREGUE";`;
+  AND pedidos.status != "CRIADO"
+  AND pedidos.status != "CANCELADO";`
 
   try {
     db.execute(selectQuery, [dataInicial, dataFinal], (err, results) => {
