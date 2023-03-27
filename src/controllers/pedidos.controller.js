@@ -2,6 +2,7 @@
 /* eslint-disable no-unused-vars */
 const { format } = require('date-fns');
 const db = require('../config/database');
+const dbPromise = require('../config/databasePromise');
 
 // ==> Método que adicionará um pedido ao banco de dados
 exports.createPedido = async (req, res) => {
@@ -175,7 +176,7 @@ exports.cancelaPedido = async (req, res) => {
 };
 
 exports.cancelaPedidComObservacao = async (req, res) => {
-  const { observacao } = req.body
+  const { observacao } = req.body;
   const { pedidoId } = req.params;
   const dataCancelamento = new Date().getTime();
   const statusPedido = 'CANCELADO';
@@ -283,7 +284,7 @@ exports.listAllTomorrowPedidos = async (req, res) => {
         }
         res.status(200).send({ pedidos: results });
       });
-    }, 5000)
+    }, 5000);
   } catch (error) {
     console.error('listAllTomorrowPedidos', error);
     res.status(500).send({ message: 'Ocorreu um erro ao listar os pedidos.' });
@@ -449,31 +450,62 @@ exports.ordersByClientReport = async (req, res) => {
       AND pedidos.status != "CANCELADO";
     `;
 
-    db.execute(selectQuery, [clienteId, dataInicial, dataFinal], (err, results) => {
-      if (err) {
-        res.status(500).send({
-          developMessage: err.message,
-          userMessage: 'Falha ao recuperar os pedidos desse Cliente.',
-        });
-        return false;
-      }
+    const [rows] = await dbPromise.execute(selectQuery, [clienteId, dataInicial, dataFinal]);
 
-      res.status(200).send({ vendas: results });
-    });
+    await this.getProdutosDoPedido(rows, res);
+
+    // if (rows) {
+    //   rows.forEach(async (row, index, array) => {
+    //     const [rows2] = await dbPromise.execute(selectQueryProdutosNoPedido, [row.id]);
+
+    //     if (rows2) {
+    //       row.itens = rows2;
+    //     }
+
+    //     if (index === array.length - 1) {
+    //       res.status(200).send({ vendas: rows });
+    //     }
+    //   });
+    // }
   } catch (error) {
     res.status(500).send({ message: 'Ocorreu um erro ao recuperar os pedidos desse Cliente.' });
   }
 };
 
+exports.getProdutosDoPedido = async (pedidos, res) => {
+  try {
+    const selectQueryProdutosNoPedido = `select item_pedido.id as itemPedidoId, produtos.id as produtoId, produtos.nome as nome, produtos.unidade_medida as unidade, preco_quantidade.preco_venda as precoVenda, item_pedido.quantidade as quantidade, item_pedido.preco_total as total from estante_produto
+    inner join produtos on produtos.id = estante_produto.produto_id
+    inner join preco_quantidade on preco_quantidade.id = estante_produto.preco_quantidade_id
+    inner join item_pedido on item_pedido.produto_id = estante_produto.produto_id
+    where item_pedido.pedido_id = ? and estante_produto.estante_id = item_pedido.estante_id;`;
+
+    // eslint-disable-next-line no-plusplus
+    for (let i = 0; i <= pedidos.length - 1; i++) {
+      // eslint-disable-next-line no-await-in-loop
+      const [rows] = await dbPromise.execute(selectQueryProdutosNoPedido, [pedidos[i].id]);
+
+      if (rows) {
+        pedidos[i].itens = rows;
+      }
+
+      if (i === pedidos.length - 1) {
+        res.status(200).send({ vendas: pedidos });
+      }
+    }
+  } catch (error) {
+    res.status(500).send({ message: 'Ocorreu um erro ao recuperar os pedidos analíticos desse Cliente.' });
+  }
+};
+
 exports.ordersBetweenDates = async (req, res) => {
   const { dataInicial, dataFinal } = req.params;
-  console.log(req.params)
   const selectQuery = `SELECT pedidos.id AS id, clientes.nome AS cliente, pedidos.data_criacao AS dataCriacao, pedidos.status AS status, pedidos.data_entrega AS dataEntrega, pedidos.valor_total AS total 
   FROM pedidos 
   INNER JOIN clientes ON clientes.id = pedidos.cliente_id
   WHERE pedidos.data_entrega BETWEEN ? AND ?
   AND pedidos.status != "CRIADO"
-  AND pedidos.status != "CANCELADO";`
+  AND pedidos.status != "CANCELADO";`;
 
   try {
     db.execute(selectQuery, [dataInicial, dataFinal], (err, results) => {
@@ -485,61 +517,61 @@ exports.ordersBetweenDates = async (req, res) => {
         return false;
       }
 
-      const total = results.reduce((acumulador, numero) => {
-        return acumulador += numero.total
-      }, 0)
+      const total = results.reduce((acumulador, numero) => (acumulador += numero.total), 0);
 
       res.status(200).send({ pedidos: results, valorTotal: total });
-    })
+    });
   } catch (error) {
     res.status(500).send({ message: `Ocorreu um erro ao recuperar os pedidos entre essas datas. (${dataInicial} a ${dataFinal})` });
   }
-}
+};
 
 exports.atualizarDataEntrega = async (req, res) => {
   const { pedidoId, dataEntrega } = req.params;
-  const patchQuery = "UPDATE pedidos SET data_entrega = ? WHERE id = ?"
+  const patchQuery = 'UPDATE pedidos SET data_entrega = ? WHERE id = ?';
 
   try {
     db.execute(patchQuery, [Number(dataEntrega), pedidoId], (err, result) => {
       if (err) {
         res.status(500).send({
           developMessage: err.message,
-          userMessage: `Falha ao alterar a data de entrega para este pedido.`,
+          userMessage: 'Falha ao alterar a data de entrega para este pedido.',
         });
         return false;
       }
 
-      res.status(200).send({ pedidoId: pedidoId, dataEntrega: format(new Date(Number(dataEntrega)), 'dd/MM/yyyy'), affectedRows: result.affectedRows });
-    })
+      res.status(200).send({ pedidoId, dataEntrega: format(new Date(Number(dataEntrega)), 'dd/MM/yyyy'), affectedRows: result.affectedRows });
+    });
   } catch (error) {
-    res.status(500).send({ message: `Ocorreu um erro ao atualizar a data de entrega para este pedido.` });
+    res.status(500).send({ message: 'Ocorreu um erro ao atualizar a data de entrega para este pedido.' });
   }
-}
+};
 
 exports.atualizarValorTotal = async (req, res) => {
   const { pedidoId } = req.params;
   const { valorTotal } = req.body;
 
-  const putQuery = valorTotal ? "UPDATE pedidos SET valor_total = ? WHERE id = ?" : "update pedidos set pedidos.valor_total = (select sum(item_pedido.preco_total) as total from item_pedido where item_pedido.pedido_id = ?) where id = ?"
-  const paramsArray = valorTotal ? [Number(valorTotal), pedidoId] : [pedidoId, pedidoId]
+  const putQuery = valorTotal ? 'UPDATE pedidos SET valor_total = ? WHERE id = ?' : 'update pedidos set pedidos.valor_total = (select sum(item_pedido.preco_total) as total from item_pedido where item_pedido.pedido_id = ?) where id = ?';
+  const paramsArray = valorTotal ? [Number(valorTotal), pedidoId] : [pedidoId, pedidoId];
 
   try {
     db.execute(putQuery, paramsArray, (err, result) => {
       if (err) {
         res.status(500).send({
           developMessage: err.message,
-          userMessage: `Falha ao atualizar o valor total deste pedido.`,
+          userMessage: 'Falha ao atualizar o valor total deste pedido.',
         });
         return false;
       }
 
-      res.status(200).send({ message: 'Pedido fechado com o valor atualizado!', pedidoId: pedidoId, valorTotal: valorTotal, affectedRows: result.affectedRows });
-    })
+      res.status(200).send({
+        message: 'Pedido fechado com o valor atualizado!', pedidoId, valorTotal, affectedRows: result.affectedRows,
+      });
+    });
   } catch (error) {
-    res.status(500).send({ message: `Ocorreu um erro ao atualizar o valor total deste pedido.` });
+    res.status(500).send({ message: 'Ocorreu um erro ao atualizar o valor total deste pedido.' });
   }
-}
+};
 
 exports.setarPedidoComoEntregue = async (req, res) => {
   const { pedidoId } = req.params;
@@ -551,36 +583,36 @@ exports.setarPedidoComoEntregue = async (req, res) => {
       if (err) {
         res.status(500).send({
           developMessage: err.message,
-          userMessage: `Falha ao atualizar pedido para status de Entregue.`,
+          userMessage: 'Falha ao atualizar pedido para status de Entregue.',
         });
         return false;
       }
 
-      res.status(200).send({ message: 'Pedido entregue com sucesso!', pedidoId: pedidoId, affectedRows: result.affectedRows });
-    })
+      res.status(200).send({ message: 'Pedido entregue com sucesso!', pedidoId, affectedRows: result.affectedRows });
+    });
   } catch (error) {
-    res.status(500).send({ message: `Ocorreu um erro ao atualizar pedido para status de Entregue.` });
+    res.status(500).send({ message: 'Ocorreu um erro ao atualizar pedido para status de Entregue.' });
   }
-}
+};
 
 exports.setarEmpresaAoPedido = async (req, res) => {
   const { pedidoId, idEmpresa } = req.params;
 
-  const patchQuery = "UPDATE pedidos SET empresa = ? WHERE pedidos.id = ?;";
+  const patchQuery = 'UPDATE pedidos SET empresa = ? WHERE pedidos.id = ?;';
 
   try {
     db.execute(patchQuery, [idEmpresa, pedidoId], (err, result) => {
       if (err) {
         res.status(500).send({
           developMessage: err.message,
-          userMessage: `Falha ao setar empresa ao pedido.`,
+          userMessage: 'Falha ao setar empresa ao pedido.',
         });
         return false;
       }
 
-      res.status(200).send({ message: 'Empresa cadastrada ao pedido com sucesso!', pedidoId: pedidoId, affectedRows: result.affectedRows });
-    })
+      res.status(200).send({ message: 'Empresa cadastrada ao pedido com sucesso!', pedidoId, affectedRows: result.affectedRows });
+    });
   } catch (error) {
-    res.status(500).send({ message: `Ocorreu um erro ao atualizar empresa do pedido.` });
+    res.status(500).send({ message: 'Ocorreu um erro ao atualizar empresa do pedido.' });
   }
-}
+};

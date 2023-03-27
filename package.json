@@ -5,9 +5,10 @@
   "main": "server.js",
   "scripts": {
     "dev": "nodemon",
-    "lint": "eslint --ext .js -f ./node_modules/eslint-friendly-formatter . --fix",
+    "lint": "eslint --fix --ext .js,.jsx .",
     "prepush": "npm run lint",
-    "start": "node server.js"
+    "start": "node server.js",
+    "prepare": "husky install"
   },
   "author": "Rafael Bonamigo",
   "license": "ISC",
@@ -16,7 +17,8 @@
     "date-fns": "^2.29.2",
     "dotenv": "^9.0.2",
     "express": "^4.17.1",
-    "express-promise-router": "^4.1.0",
+    "express-asyncify": "^1.1.0",
+    "express-promise-router": "^4.1.1",
     "jsonwebtoken": "^8.5.1",
     "mysql": "^2.18.1",
     "mysql2": "^2.2.5",
@@ -26,6 +28,7 @@
   "devDependencies": {
     "eslint": "^7.26.0",
     "eslint-config-airbnb-base": "^14.2.1",
-    "eslint-plugin-import": "^2.23.2"
+    "eslint-plugin-import": "^2.23.2",
+    "husky": "^8.0.3"
   }
 }

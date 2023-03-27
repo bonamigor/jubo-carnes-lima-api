@@ -13,6 +13,8 @@
     },
     "rules": {
         "consistent-return": "off",
-        "no-console": "off"
+        "no-console": "off",
+        "no-return-assign": "off",
+        "no-param-reassign": "off"
     }
 }

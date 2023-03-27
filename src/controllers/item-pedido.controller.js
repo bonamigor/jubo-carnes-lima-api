@@ -1,7 +1,9 @@
 const db = require('../config/database');
 
 exports.adicionarItemAoPedido = async (req, res) => {
-  const { estanteId, produtoId, precoVenda, quantidade } = req.body;
+  const {
+    estanteId, produtoId, precoVenda, quantidade,
+  } = req.body;
   const { pedidoId } = req.params;
   const numberPedidoId = Number(pedidoId);
   const insertQuery = 'INSERT INTO item_pedido (pedido_id, produto_id, estante_id, quantidade, preco_total) VALUES (?, ?, ?, ?, ?)';
@@ -27,7 +29,9 @@ exports.adicionarItemAoPedido = async (req, res) => {
 };
 
 exports.atualizaItemNoPedido = async (req, res) => {
-  const { estanteId, produtoId, precoVenda, quantidade } = req.body;
+  const {
+    produtoId, precoVenda, quantidade,
+  } = req.body;
   const { pedidoId, itemPedidoId } = req.params;
   const updateQuery = 'UPDATE item_pedido SET pedido_id = ?, produto_id = ?, quantidade = ?, preco_total = ? WHERE id = ?';
 
@@ -100,7 +104,7 @@ exports.atualizaQuantidadeAoAtualizar = async (req, res) => {
 
 exports.deletarItemPedido = async (req, res) => {
   try {
-    const { pedidoId, itemPedidoId } = req.params;
+    const { itemPedidoId } = req.params;
     const deleteQuery = 'DELETE FROM item_pedido where item_pedido.id = ?';
 
     db.execute(deleteQuery, [itemPedidoId], (error, results) => {

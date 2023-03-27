@@ -36,8 +36,7 @@ exports.createProduto = async (req, res) => {
             affectedRows: results.affectedRows,
           },
         });
-      })
-      
+      });
     });
   } catch (error) {
     console.error('createProduto', error);

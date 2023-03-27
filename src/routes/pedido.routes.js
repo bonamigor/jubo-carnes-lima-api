@@ -1,6 +1,7 @@
 const express = require('express');
+const asyncify = require('express-asyncify');
 
-const router = express.Router();
+const router = asyncify(express.Router());
 const pedidosController = require('../controllers/pedidos.controller');
 
 // ==> GET http://localhost:3000/api/pedidos
@@ -27,18 +28,20 @@ router.put('/pedidos/:pedidoId/entregar', pedidosController.entregaPedido);
 // ==> PUT http://localhost:3000/api/pedidos/pedidoId/observacao
 router.put('/pedidos/:pedidoId/observacao', pedidosController.adicionarObservacao);
 
-router.patch('/pedidos/:pedidoId/alterar/entrega/:dataEntrega', pedidosController.atualizarDataEntrega)
+router.patch('/pedidos/:pedidoId/alterar/entrega/:dataEntrega', pedidosController.atualizarDataEntrega);
 
-router.patch('/pedidos/:pedidoId/entrega', pedidosController.setarPedidoComoEntregue)
+router.patch('/pedidos/:pedidoId/entrega', pedidosController.setarPedidoComoEntregue);
 
-router.patch('/pedidos/:pedidoId/empresa/:idEmpresa', pedidosController.setarEmpresaAoPedido)
+router.patch('/pedidos/:pedidoId/empresa/:idEmpresa', pedidosController.setarEmpresaAoPedido);
 
-router.put('/pedidos/:pedidoId/atualizar/valorTotal', pedidosController.atualizarValorTotal)
+router.put('/pedidos/:pedidoId/atualizar/valorTotal', pedidosController.atualizarValorTotal);
 
 // ==> POST http://localhost:3000/api/pedidos
 router.post('/pedidos', pedidosController.createPedido);
 
 router.post('/pedidos/relatorio-data', pedidosController.ordersByClientReport);
+
+router.post('/pedidos/relatorio-data/analitico', pedidosController.getProdutosDoPedido);
 
 router.get('/pedidos/relatorio/datas/:dataInicial/to/:dataFinal', pedidosController.ordersBetweenDates);
 
