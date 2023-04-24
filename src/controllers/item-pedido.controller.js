@@ -41,7 +41,7 @@ exports.atualizaItemNoPedido = async (req, res) => {
     (error, result) => {
       if (error || result.affectedRows === 0) {
         res.status(500).send({
-          developMessage: error.sqlMessage,
+          developMessage: error.message,
           userMessage: 'Falha ao atualizar o Item do pedido.',
         });
         return false;
