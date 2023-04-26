@@ -7,7 +7,7 @@ const db = require('../config/database');
  de uma determinada estante com os seus preços de venda
  e quantidades
 */
-exports.listarDetalhadoNaEstante = async (req, res) => {
+exports.listarDetalhado = async (req, res) => {
   try {
     const selectQuery = `SELECT produto_id as produtoId, produtos.nome AS nome,
     produtos.preco_custo as precoCusto, produtos.unidade_medida as unidade,
@@ -16,37 +16,6 @@ exports.listarDetalhadoNaEstante = async (req, res) => {
     INNER JOIN produtos ON estante_produto.produto_id = produtos.id
     INNER JOIN preco_quantidade ON estante_produto.preco_quantidade_id = preco_quantidade.id
     WHERE estante_produto.estante_id = ?`;
-
-    db.execute(selectQuery, [req.params.id], (err, results) => {
-      if (err) {
-        res.status(500).send({
-          developMessage: err.message,
-          userMessage: 'Falha ao listar os Produtos da Estante com detalhes.',
-        });
-        return false;
-      }
-      res.status(200).send({ estante: { produtos: results } });
-    });
-  } catch (error) {
-    console.error('listAllProdutosNaEstante', error);
-    res.status(500).send({ message: 'Ocorreu um erro ao listar os produtos na estante.' });
-  }
-};
-
-/*
- Método que retornará uma lista de produtos
- de uma determinada estante com os seus preços de venda
- e quantidades
-*/
-exports.listarDetalhadoNoPedido = async (req, res) => {
-  try {
-    const selectQuery = `SELECT produto_id as produtoId, produtos.nome AS nome,
-    produtos.preco_custo as precoCusto, produtos.unidade_medida as unidade,
-    preco_quantidade.preco_venda as precoVenda, preco_quantidade.quantidade
-    FROM estante_produto
-    INNER JOIN produtos ON estante_produto.produto_id = produtos.id
-    INNER JOIN preco_quantidade ON estante_produto.preco_quantidade_id = preco_quantidade.id
-    WHERE estante_produto.estante_id = ? AND preco_quantidade.quantidade > 0`;
 
     db.execute(selectQuery, [req.params.id], (err, results) => {
       if (err) {
