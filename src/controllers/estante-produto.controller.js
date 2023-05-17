@@ -49,6 +49,30 @@ exports.deleteProdutoDaEstante = async (req, res) => {
   }
 };
 
+// ==> Metodo que alterara a coluna 'ativo' do produto
+exports.updateActiveStatus = async (req, res) => {
+  try {
+    const { ativo, estanteId, produtoId } = req.body;
+    const query = 'UPDATE estante_produto SET ativo = ? WHERE estante_produto.estante_id = ? AND estante_produto.produto_id = ?;';
+    db.execute(query, [ativo, estanteId, produtoId], (err, results) => {
+      if (err) {
+        res.status(500).send({
+          developMessage: err.message,
+          userMessage: 'Falha ao atualizar o status do produto.',
+        });
+        return false;
+      }
+      res.status(201).send({
+        message: `Status do produto ${produtoId} da estante ${estanteId} foi atualizado para ${ativo === 1 ? '"ATIVO"' : '"DESATIVADO"'}`,
+        affectedRows: results.affectedRows,
+      });
+    });
+  } catch (error) {
+    console.error('deleteProdutoDaEstante', error);
+    res.status(500).send({ message: 'Ocorreu um erro ao atualizar o status do produto.' });
+  }
+};
+
 // ==> Método que listará todos os produtos de uma estante específica
 exports.listAllProdutosNaEstante = async (req, res) => {
   try {
