@@ -47,8 +47,7 @@ exports.listarDetalhadoNoPedido = async (req, res) => {
     INNER JOIN produtos ON estante_produto.produto_id = produtos.id
     INNER JOIN preco_quantidade ON estante_produto.preco_quantidade_id = preco_quantidade.id
     WHERE estante_produto.estante_id = ? 
-    AND estante_produto.ativo = 1
-    AND preco_quantidade.quantidade > 0`;
+    AND estante_produto.ativo = 1`;
 
     db.execute(selectQuery, [req.params.id], (err, results) => {
       if (err) {
