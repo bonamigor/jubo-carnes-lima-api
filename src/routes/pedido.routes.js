@@ -45,6 +45,8 @@ router.post('/pedidos/relatorio-data/analitico', pedidosController.getProdutosDo
 
 router.get('/pedidos/relatorio/datas/:dataInicial/to/:dataFinal', pedidosController.ordersBetweenDates);
 
+router.patch('/pedidos/:pedidoId/finalizar', pedidosController.finalizarPedido);
+
 // ==> DELETE http://localhost:3000/api/pedidos
 router.delete('/pedidos/:pedidoId', pedidosController.deletePedido);
 
