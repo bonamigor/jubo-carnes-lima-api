@@ -250,7 +250,7 @@ exports.deletePedido = async (req, res) => {
 
 // ==> Método que listará todos os pedidos
 exports.listAllPedidos = async (req, res) => {
-  const selectQuery = 'SELECT pedidos.id AS id, pedidos.data_criacao AS dataCriacao, pedidos.valor_total AS valorTotal, pedidos.status as status, pedidos.observacao as observacao, pedidos.obsCancelamento as obsCancelamento, pedidos.is_finalizado as isFinalizado, clientes.nome AS nome, clientes.endereco AS endereco, clientes.cidade AS cidade, clientes.estado AS estado, clientes.telefone AS telefone FROM pedidos INNER JOIN clientes ON clientes.id = pedidos.cliente_id WHERE pedidos.status = "CRIADO" AND pedidos.is_finalizado = 1 AND pedidos.valor_total > 0';
+  const selectQuery = 'SELECT pedidos.id AS id, pedidos.data_criacao AS dataCriacao, pedidos.valor_total AS valorTotal, pedidos.status as status, pedidos.observacao as observacao, pedidos.obsCancelamento as obsCancelamento, pedidos.is_finalizado as isFinalizado, clientes.nome AS nome, clientes.endereco AS endereco, clientes.cidade AS cidade, clientes.estado AS estado, clientes.telefone AS telefone FROM pedidos INNER JOIN clientes ON clientes.id = pedidos.cliente_id WHERE pedidos.status = "CRIADO" AND pedidos.valor_total > 0';
   try {
     db.execute(selectQuery, (err, results) => {
       if (err) {
