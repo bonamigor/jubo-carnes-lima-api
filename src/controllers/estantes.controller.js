@@ -149,3 +149,24 @@ exports.listOneEstante = async (req, res) => {
     res.status(500).send({ message: 'Ocorreu um erro ao listar a estante.' });
   }
 };
+
+// ==> Método que ativa ou desativa uma estante específica
+exports.alterarEstadoDaEstante = async (req, res) => {
+  const { id, status } = req.params;
+  const sql = 'UPDATE estantes SET ativa = ? WHERE id = ?';
+  try {
+    db.execute(sql, [status, id], (err, results) => {
+      if (err) {
+        res.status(500).send({
+          developMessage: err,
+          userMessage: 'Falha ao desativar a Estante.',
+        });
+        return false;
+      }
+      res.status(200).send({ message: 'Estante desativada com sucesso!' });
+    });
+  } catch (error) {
+    console.error('listOneEstante', error);
+    res.status(500).send({ message: 'Ocorreu um erro ao listar a estante.' });
+  }
+};
