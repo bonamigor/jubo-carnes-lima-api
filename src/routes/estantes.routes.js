@@ -18,7 +18,10 @@ router.post('/estantes', estanteController.createEstante);
 // ==> PUT http://localhost:3000/api/estantes
 router.put('/estantes', estanteController.updateEstante);
 
-// ==> DELETE http://localhost:3000/api/estantes
+// ==> DELETE http://localhost:3000/api/estantes/id
 router.delete('/estantes/:id', estanteController.deleteEstante);
+
+// ==> PATCH http://localhost:3000/api/estantes/id
+router.patch('/estantes/:id/:status', estanteController.alterarEstadoDaEstante);
 
 module.exports = router;
