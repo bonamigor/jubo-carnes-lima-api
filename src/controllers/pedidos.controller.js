@@ -374,7 +374,7 @@ exports.calculaValorTotal = async (req, res) => {
 
 exports.recuperarProdutosNoPedido = async (req, res) => {
   const { pedidoId } = req.params;
-  const selectQuery = `select item_pedido.id as itemPedidoId, produtos.id as produtoId, produtos.nome as nome, produtos.unidade_medida as unidade, preco_quantidade.preco_venda as precoVenda, item_pedido.quantidade as quantidade, item_pedido.preco_total as total from estante_produto
+  const selectQuery = `select item_pedido.id as itemPedidoId, produtos.id as produtoId, estante_produto.estante_id as estanteId, produtos.nome as nome, produtos.unidade_medida as unidade, preco_quantidade.preco_venda as precoVenda, item_pedido.quantidade as quantidade, item_pedido.preco_total as total from estante_produto
   inner join produtos on produtos.id = estante_produto.produto_id
   inner join preco_quantidade on preco_quantidade.id = estante_produto.preco_quantidade_id
   inner join item_pedido on item_pedido.produto_id = estante_produto.produto_id
