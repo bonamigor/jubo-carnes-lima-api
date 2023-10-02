@@ -36,6 +36,8 @@ router.patch('/pedidos/:pedidoId/empresa/:idEmpresa', pedidosController.setarEmp
 
 router.put('/pedidos/:pedidoId/atualizar/valorTotal', pedidosController.atualizarValorTotal);
 
+router.get('/pedidos/:pedidoId/recuperarValorTotal', pedidosController.recuperarValorTotal);
+
 // ==> POST http://localhost:3000/api/pedidos
 router.post('/pedidos', pedidosController.createPedido);
 
