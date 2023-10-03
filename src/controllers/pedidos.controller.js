@@ -374,7 +374,7 @@ exports.calculaValorTotal = async (req, res) => {
 
 exports.recuperarProdutosNoPedido = async (req, res) => {
   const { pedidoId } = req.params;
-  const selectQuery = `select item_pedido.id as itemPedidoId, produtos.id as produtoId, produtos.nome as nome, produtos.unidade_medida as unidade, preco_quantidade.preco_venda as precoVenda, item_pedido.quantidade as quantidade, item_pedido.preco_total as total from estante_produto
+  const selectQuery = `select item_pedido.id as itemPedidoId, produtos.id as produtoId, estante_produto.estante_id as estanteId, produtos.nome as nome, produtos.unidade_medida as unidade, preco_quantidade.preco_venda as precoVenda, item_pedido.quantidade as quantidade, item_pedido.preco_total as total from estante_produto
   inner join produtos on produtos.id = estante_produto.produto_id
   inner join preco_quantidade on preco_quantidade.id = estante_produto.preco_quantidade_id
   inner join item_pedido on item_pedido.produto_id = estante_produto.produto_id
@@ -418,12 +418,12 @@ exports.recuperarUltimoPedidoByCliente = async (req, res) => {
 
 exports.recuperarPedidosByCliente = async (req, res) => {
   const { clienteId } = req.params;
-  const mes = new Date().getMonth()
+  const mes = new Date().getMonth();
   let dataParaFiltro;
   if (mes >= 6) {
-    dataParaFiltro = new Date('July, 1').setFullYear(new Date().getFullYear())
+    dataParaFiltro = new Date('July, 1').setFullYear(new Date().getFullYear());
   } else {
-    dataParaFiltro = new Date('January, 1').setFullYear(new Date().getFullYear())
+    dataParaFiltro = new Date('January, 1').setFullYear(new Date().getFullYear());
   }
   const selectQuery = "SELECT pedidos.id AS id, pedidos.data_criacao AS dataCriacao, pedidos.data_entrega AS dataEntrega, pedidos.valor_total AS valorTotal, pedidos.status as status, pedidos.observacao as observacao, pedidos.obsCancelamento as obsCancelamento, pedidos.is_finalizado as isFinalizado, clientes.nome AS nome, clientes.endereco AS endereco, clientes.cidade AS cidade, clientes.estado AS estado, clientes.telefone AS telefone FROM pedidos INNER JOIN clientes ON clientes.id = pedidos.cliente_id WHERE pedidos.cliente_id = ? AND pedidos.data_criacao >= ? AND pedidos.status = 'CONFIRMADO' OR 'ENTREGUE'";
   try {
@@ -573,6 +573,54 @@ exports.atualizarValorTotal = async (req, res) => {
 
       res.status(200).send({
         message: 'Pedido fechado com o valor atualizado!', pedidoId, valorTotal, affectedRows: result.affectedRows,
+      });
+    });
+  } catch (error) {
+    res.status(500).send({ message: 'Ocorreu um erro ao atualizar o valor total deste pedido.' });
+  }
+};
+
+exports.atualizarValorTotalSemSend = async (req, res) => {
+  const { pedidoId } = req.params;
+  const { valorTotal } = req.body;
+
+  const putQuery = valorTotal ? 'UPDATE pedidos SET valor_total = ? WHERE id = ?' : 'update pedidos set pedidos.valor_total = (select sum(item_pedido.preco_total) as total from item_pedido where item_pedido.pedido_id = ?) where id = ?';
+  const paramsArray = valorTotal ? [Number(valorTotal), pedidoId] : [pedidoId, pedidoId];
+
+  try {
+    db.execute(putQuery, paramsArray, (err, result) => {
+      if (err) {
+        res.status(500).send({
+          developMessage: err.message,
+          userMessage: 'Falha ao atualizar o valor total deste pedido.',
+        });
+        return false;
+      }
+    });
+  } catch (error) {
+    res.status(500).send({ message: 'Ocorreu um erro ao atualizar o valor total deste pedido.' });
+  }
+};
+
+exports.recuperarValorTotal = async (req, res) => {
+  const { pedidoId } = req.params;
+
+  const selectQuery = `SELECT pedidos.valor_total FROM pedidos WHERE pedidos.id = ${pedidoId};`;
+
+  await this.atualizarValorTotalSemSend(req, res);
+
+  try {
+    db.query(selectQuery, (err, result) => {
+      if (err) {
+        res.status(500).send({
+          developMessage: err.message,
+          userMessage: 'Falha ao recuperar o valor total deste pedido.',
+        });
+        return false;
+      }
+
+      res.status(200).send({
+        message: 'Valor total do pedido recuperado com sucesso!', pedidoId, valorTotal: result[0].valor_total,
       });
     });
   } catch (error) {
