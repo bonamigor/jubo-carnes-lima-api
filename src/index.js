@@ -12,7 +12,7 @@ const index = require('./routes/index');
 
 const exclusions = ['/api/autenticacao'];
 
-const origin = process.env.LOCAL ? 'http://localhost:3000' : 'https://jubo-paraiso-ribeiro-ui.vercel.app/';
+const origin = process.env.LOCAL ? 'http://localhost:3000' : 'https://jubo-paraiso-ribeiro-ui.vercel.app';
 
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
