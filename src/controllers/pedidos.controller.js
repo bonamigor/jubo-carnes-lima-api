@@ -418,16 +418,9 @@ exports.recuperarUltimoPedidoByCliente = async (req, res) => {
 
 exports.recuperarPedidosByCliente = async (req, res) => {
   const { clienteId } = req.params;
-  const mes = new Date().getMonth();
-  let dataParaFiltro;
-  if (mes >= 6) {
-    dataParaFiltro = new Date('July, 1').setFullYear(new Date().getFullYear());
-  } else {
-    dataParaFiltro = new Date('January, 1').setFullYear(new Date().getFullYear());
-  }
-  const selectQuery = "SELECT pedidos.id AS id, pedidos.data_criacao AS dataCriacao, pedidos.data_entrega AS dataEntrega, pedidos.valor_total AS valorTotal, pedidos.status as status, pedidos.observacao as observacao, pedidos.obsCancelamento as obsCancelamento, pedidos.is_finalizado as isFinalizado, clientes.nome AS nome, clientes.endereco AS endereco, clientes.cidade AS cidade, clientes.estado AS estado, clientes.telefone AS telefone FROM pedidos INNER JOIN clientes ON clientes.id = pedidos.cliente_id WHERE pedidos.cliente_id = ? AND pedidos.data_criacao >= ? AND pedidos.status = 'CONFIRMADO' OR 'ENTREGUE'";
+  const selectQuery = "SELECT pedidos.id AS id, pedidos.data_criacao AS dataCriacao, pedidos.data_entrega AS dataEntrega, pedidos.valor_total AS valorTotal, pedidos.status as status, pedidos.observacao as observacao, pedidos.obsCancelamento as obsCancelamento, pedidos.is_finalizado as isFinalizado, clientes.nome AS nome, clientes.endereco AS endereco, clientes.cidade AS cidade, clientes.estado AS estado, clientes.telefone AS telefone FROM pedidos INNER JOIN clientes ON clientes.id = pedidos.cliente_id WHERE pedidos.cliente_id = ? AND pedidos.status = 'CONFIRMADO' OR 'ENTREGUE'";
   try {
-    db.execute(selectQuery, [clienteId, dataParaFiltro], (error, results) => {
+    db.execute(selectQuery, [clienteId], (error, results) => {
       if (error) {
         res.status(500).send({
           developMessage: error.message,
