@@ -93,7 +93,7 @@ exports.deleteEstante = async (req, res) => {
 // ==> Método que retorno a Estante porém sem os dados do Cliente, apenas o ID
 exports.listAllEstantes = async (req, res) => {
   try {
-    db.execute('SELECT estantes.id as id, estantes.cliente_id as clienteId, clientes.nome as cliente, estantes.periodo as periodo, estantes.observacao as observacao, estantes.ativa as ativa FROM estantes INNER JOIN clientes ON estantes.cliente_id = clientes.id', (err, results) => {
+    db.execute('SELECT estantes.id as id, estantes.cliente_id as clienteId, clientes.nome as cliente, estantes.periodo as periodo, estantes.observacao as observacao, estantes.ativa as ativa FROM estantes INNER JOIN clientes ON estantes.cliente_id = clientes.id ORDER BY clientes.nome ASC', (err, results) => {
       if (err) {
         res.status(500).send({
           developMessage: err.message,
@@ -112,7 +112,7 @@ exports.listAllEstantes = async (req, res) => {
 // ==> Método que retorna a Estante com os Dados do Cliente (Nome);
 exports.listAllEstantesCliente = async (req, res) => {
   try {
-    const selectQuery = 'SELECT estantes.id, periodo, clientes.id as clienteId, clientes.nome as cliente, estantes.observacao as observacao, estantes.ativa FROM estantes INNER JOIN clientes ON estantes.cliente_id = clientes.id where cliente_id = ? and ativa = 1';
+    const selectQuery = 'SELECT estantes.id, periodo, clientes.id as clienteId, clientes.nome as cliente, estantes.observacao as observacao, estantes.ativa FROM estantes INNER JOIN clientes ON estantes.cliente_id = clientes.id where cliente_id = ? and ativa = 1 ORDER BY clientes.nome ASC';
     db.execute(selectQuery, [req.params.id], (err, results) => {
       if (err) {
         res.status(500).send({

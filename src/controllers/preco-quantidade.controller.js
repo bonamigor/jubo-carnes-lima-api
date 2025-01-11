@@ -15,7 +15,8 @@ exports.listarDetalhadoNaEstante = async (req, res) => {
     FROM estante_produto
     INNER JOIN produtos ON estante_produto.produto_id = produtos.id
     INNER JOIN preco_quantidade ON estante_produto.preco_quantidade_id = preco_quantidade.id
-    WHERE estante_produto.estante_id = ?`;
+    WHERE estante_produto.estante_id = ?
+    ORDER BY produtos.nome ASC`;
 
     db.execute(selectQuery, [req.params.id], (err, results) => {
       if (err) {
@@ -47,7 +48,8 @@ exports.listarDetalhadoNoPedido = async (req, res) => {
     INNER JOIN produtos ON estante_produto.produto_id = produtos.id
     INNER JOIN preco_quantidade ON estante_produto.preco_quantidade_id = preco_quantidade.id
     WHERE estante_produto.estante_id = ? 
-    AND estante_produto.ativo = 1`;
+    AND estante_produto.ativo = 1
+    ORDER BY produtos.nome ASC`;
 
     db.execute(selectQuery, [req.params.id], (err, results) => {
       if (err) {

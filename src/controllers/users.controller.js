@@ -147,7 +147,7 @@ exports.deleteUser = async (req, res) => {
 // ==> Método que listará todos os usuário
 exports.listAllUsers = async (req, res) => {
   try {
-    db.execute('SELECT users.id, users.nome, users.email, users.admin, clientes.nome as cliente FROM users LEFT JOIN clientes ON clientes.id = cliente_id', (err, results) => {
+    db.execute('SELECT users.id, users.nome, users.email, users.admin, clientes.nome as cliente FROM users LEFT JOIN clientes ON clientes.id = cliente_id ORDER BY users.nome ASC', (err, results) => {
       if (err) {
         res.status(500).send({
           developMessage: err.message,

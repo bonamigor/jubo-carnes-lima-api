@@ -98,7 +98,7 @@ exports.deleteProduto = async (req, res) => {
 // ==> Método que retorna todos os Produtos cadastrados.
 exports.listAllProdutos = async (req, res) => {
   try {
-    db.execute('SELECT id, nome, preco_custo as preco, unidade_medida as unidade FROM produtos', (err, results) => {
+    db.execute('SELECT id, nome, preco_custo as preco, unidade_medida as unidade FROM produtos ORDER BY produtos.nome ASC', (err, results) => {
       if (err) {
         res.status(500).send({
           developMessage: err.message,

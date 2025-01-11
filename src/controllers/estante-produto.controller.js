@@ -76,7 +76,7 @@ exports.updateActiveStatus = async (req, res) => {
 // ==> Método que listará todos os produtos de uma estante específica
 exports.listAllProdutosNaEstante = async (req, res) => {
   try {
-    const selectQuery = 'SELECT produtos.nome as nome_produto, produtos.preco_custo, produtos.unidade_medida from estante_produto INNER JOIN produtos ON estante_produto.produto_id = produtos.id WHERE estante_id = ?';
+    const selectQuery = 'SELECT produtos.nome as nome_produto, produtos.preco_custo, produtos.unidade_medida from estante_produto INNER JOIN produtos ON estante_produto.produto_id = produtos.id WHERE estante_id = ? ORDER BY produtos.nome ASC';
     db.execute(selectQuery, [req.params.id], (err, results) => {
       if (err) {
         res.status(500).send({

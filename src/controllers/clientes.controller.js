@@ -89,7 +89,7 @@ exports.deleteCliente = async (req, res) => {
 // ==> Método que listará todos os clientes
 exports.listAllClientes = async (req, res) => {
   try {
-    db.execute('SELECT * FROM clientes', (err, results) => {
+    db.execute('SELECT * FROM clientes ORDER BY clientes.nome ASC', (err, results) => {
       if (err) {
         res.status(500).send({
           developMessage: err.message,
