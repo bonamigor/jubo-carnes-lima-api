@@ -98,7 +98,26 @@ exports.deleteProduto = async (req, res) => {
 // ==> Método que retorna todos os Produtos cadastrados.
 exports.listAllProdutos = async (req, res) => {
   try {
-    db.execute('SELECT id, nome, preco_custo as preco, unidade_medida as unidade FROM produtos ORDER BY produtos.nome ASC', (err, results) => {
+    db.execute('SELECT id, nome, preco_custo as preco, unidade_medida as unidade FROM produtos WHERE ativo = 1 ORDER BY produtos.nome ASC', (err, results) => {
+      if (err) {
+        res.status(500).send({
+          developMessage: err.message,
+          userMessage: 'Falha ao listar os Produtos.',
+        });
+        return false;
+      }
+      res.status(200).send({ produtos: results });
+    });
+  } catch (error) {
+    console.error('listAllProdutos', error);
+    res.status(500).send({ message: 'Ocorreu um erro ao listar os produtos.' });
+  }
+};
+
+// ==> Método que retorna todos os Produtos cadastrados.
+exports.listAllProdutosParaAdmin = async (req, res) => {
+  try {
+    db.execute('SELECT id, nome, preco_custo as preco, unidade_medida as unidade, ativo FROM produtos', (err, results) => {
       if (err) {
         res.status(500).send({
           developMessage: err.message,
@@ -116,7 +135,7 @@ exports.listAllProdutos = async (req, res) => {
 
 exports.listOneProduto = async (req, res) => {
   try {
-    db.execute('SELECT * FROM produtos WHERE id = ?',
+    db.execute('SELECT * FROM produtos WHERE id = ? AND ativo = 1',
       [req.params.id],
       (err, results) => {
         if (err) {
@@ -142,6 +161,7 @@ exports.listAllProdutosForBuying = async (req, res) => {
       INNER JOIN item_pedido ON pedidos.id = item_pedido.pedido_id
       INNER JOIN produtos ON item_pedido.produto_id = produtos.id
       WHERE status = 'CONFIRMADO' AND data_entrega BETWEEN ? AND ?
+      AND produtos.ativo = 1
       GROUP BY produtos.nome, produtos.unidade_medida
       ORDER BY produtos.nome ASC
     `;
@@ -159,5 +179,30 @@ exports.listAllProdutosForBuying = async (req, res) => {
     });
   } catch (error) {
     res.status(500).send({ message: 'Ocorreu um erro ao listar os produtos nessa data.' });
+  }
+};
+
+exports.updateProductStatus = async (req, res) => {
+  const {
+    ativo,
+  } = req.body;
+  const novoStatusAtivo = ativo === 1 ? 0 : 1;
+  try {
+    db.execute('UPDATE produtos SET ativo = ? WHERE id = ?', [novoStatusAtivo, req.params.id], (err, results) => {
+      if (err) {
+        res.status(500).send({
+          developMessage: err.message,
+          userMessage: 'Falha ao atualizar o status do Produto.',
+        });
+        return false;
+      }
+      res.status(200).send({
+        message: 'Produto atualizado com sucesso!',
+        affectedRows: results.affectedRows,
+      });
+    });
+  } catch (error) {
+    console.error('updateProductStatus', error);
+    res.status(500).send({ message: 'Ocorreu um erro ao atualizar o status do Produto.' });
   }
 };
