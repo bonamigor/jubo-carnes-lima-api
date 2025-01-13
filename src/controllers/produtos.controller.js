@@ -8,8 +8,8 @@ exports.createProduto = async (req, res) => {
     nome, precoCusto, unidadeMedida,
   } = req.body;
   try {
-    const insertQuery = 'INSERT INTO produtos (nome, preco_custo, unidade_medida) VALUES (?, ?, ?)';
-    db.execute(insertQuery, [nome, precoCusto, unidadeMedida], (err, results) => {
+    const insertQuery = 'INSERT INTO produtos (nome, preco_custo, unidade_medida, ativo) VALUES (?, ?, ?, ?)';
+    db.execute(insertQuery, [nome, precoCusto, unidadeMedida, 1], (err, results) => {
       if (err) {
         res.status(500).send({
           developMessage: err.message,
