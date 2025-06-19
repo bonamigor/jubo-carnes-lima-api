@@ -12,7 +12,7 @@ const index = require('./routes/index');
 
 const exclusions = ['/api/autenticacao'];
 
-const origin = process.env.LOCAL ? 'http://localhost:3000' : 'https://www.paraiso-ribeiro.com.br';
+const origin = process.env.LOCAL ? 'http://localhost:3000' : 'https://www.casadecarneslima.app.br/';
 
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
